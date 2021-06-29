@@ -1,0 +1,25 @@
+dn: dc=example,dc=org
+objectclass: domain
+objectclass: extensibleObject
+objectclass: top
+dc: example
+
+dn: ou=people,dc=example,dc=org
+objectClass: organizationalUnit
+objectClass: top
+ou: people
+
+dn: ou=groups,dc=example,dc=org
+objectClass: organizationalUnit
+objectClass: top
+ou: groups
+
+dn: uid=ben,ou=people,dc=example,dc=org
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+cn: User
+sn: User Test
+uid: ben
+userPassword: {SSHA}/roseEX99zfcPCUwz/h2xa8gpZofNj7cLuOs4Q==
