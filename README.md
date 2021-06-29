@@ -9,7 +9,10 @@
 
 ## Cara compile :
 1. mvn clean
-2. mvn package
+2. mvn package > juga akan menghasilkan file .jar di folder target
+
+## Cara run via Jar :
+1. java -jar container-monitoring-0.0.2-SNAPSHOT.jar 
 
 ## Cara run :
 1. mvn spring-boot:run

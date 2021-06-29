@@ -46,7 +46,7 @@ public class AuthenticatingLdapApplicationTests {
 	public void loginWithValidUserThenAuthenticated3() throws Exception {
 		FormLoginRequestBuilder login = formLogin()
 			.user("user")
-			.password("secret");
+			.password("password");
 
 		mockMvc.perform(login)
 			.andExpect(authenticated());
