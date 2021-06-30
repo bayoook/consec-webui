@@ -5,7 +5,7 @@
 2. install maven 
 3. POSTGRESS untuk database
 4. create database dengan nama monitoring
-5. untuk pertama kali pastikan sebelum running di file \djp\src\main\resources\application.properties user dan password sudah sesuai dengan database
+5. untuk pertama kali pastikan sebelum running di file \src\main\resources\application.properties user dan password sudah sesuai dengan database
 
 ## Cara compile :
 1. mvn clean

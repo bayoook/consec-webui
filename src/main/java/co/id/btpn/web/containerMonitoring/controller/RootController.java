@@ -28,9 +28,9 @@ public class RootController {
 
 
     @GetMapping("scanondemandindex") public String scanOnDemand() { return "auth/scanondemand/index"; }
+   
     @GetMapping("scanregistryindex") public String scanRegistry() { return "auth/scanregistry/index"; }
-	 
-	
+
     
     @ModelAttribute("attributes")
     public Map<?,?> attributes() {

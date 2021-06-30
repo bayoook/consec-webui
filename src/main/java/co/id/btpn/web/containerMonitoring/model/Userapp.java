@@ -1,5 +1,7 @@
 package co.id.btpn.web.containerMonitoring.model;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -25,7 +27,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Userapp {
+public class Userapp  {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -35,6 +37,17 @@ public class Userapp {
 	private String name;
 	@Column(name = "active")
 	private int active;
+
+	
+	@Column(name="CREATED_BY", nullable = true)
+	private String createdBy;
+	@Column(name="CREATED_DATE", nullable = true)
+	private java.util.Date createdDate;
+	@Column(name="MODIFIED_BY", nullable = true)
+	private String modifiedBy;
+	@Column(name="MODIFIED_DATE", nullable = true)
+	private Date modifiedDate;
+
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Role roleId;
