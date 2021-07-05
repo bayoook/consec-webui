@@ -27,8 +27,7 @@ public class ConfigFalco{
 	private Long id;
 	@Column(name="name")
 	private String name;
-	
+	@Column(name="config",columnDefinition="TEXT")
+	private String config;
 
-	
-	
 }

@@ -6,6 +6,16 @@ var KTTinymce = function () {
     var demos = function () {
         
         tinymce.init({
+            selector: '#kt-tinymce-ta',
+            plugins: 'codesample',
+            codesample_languages: [
+                {text: 'YAML', value: 'yaml'}
+            ],
+            toolbar: 'codesample',
+        });
+
+
+        tinymce.init({
 			selector: '#kt-tinymce-1',
             toolbar: false,
             statusbar: false

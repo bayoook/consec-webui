@@ -15,6 +15,14 @@
 
 
 <th:block layout:fragment="js-extra">
+	
+<!--begin::Page Vendors(used by this page)-->
+<script th:src="@{assets/plugins/custom/tinymce/tinymce.bundle.js}"></script>
+<!--end::Page Vendors-->
+<!--begin::Page Scripts(used by this page)-->
+<script th:src="@{assets/js/pages/crud/forms/editors/tinymce.js}"></script>
+<!--end::Page Scripts-->
+
 
 </th:block>
 
@@ -52,18 +60,14 @@
 										</div>
 									</div>
 									
-									<!-- <div class="form-group row">
-										<label class="col-3 col-form-label">Role Name</label>
+									<div class="form-group row">
+										<label class="col-3 col-form-label">Config</label>
 										<div class="col-9">
 											
-											<select  class="form-control" formControlName="roleId"
-													name="roleId" id="roleId" th:field="*{roleId}" th:value="${userapp.roleId}">
-													<option th:each="role : ${roleList}" th:value="${role.id}"
-															th:text="${role.role}"></option>
-												
-											</select>
+											<textarea id="kt-tinymce-ta" name="kt-tinymce-ta"  th:field="*{config}"   th:value="${configAnchore.config}"></textarea>
+											
 										</div>
-									</div> -->
+									</div>
 								</div>
 							</div>	
 							</div>

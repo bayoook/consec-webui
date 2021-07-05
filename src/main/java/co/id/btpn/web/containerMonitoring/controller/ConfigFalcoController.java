@@ -71,6 +71,8 @@ public class ConfigFalcoController {
     @PostMapping("configfalcoedit")
     public String editPost(ConfigFalco  configFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
         
+        System.out.println("configFalco config >>> "+configFalco.getConfig());
+
     	configFalcoService.update(configFalco);
     	
     	return "redirect:configfalcoindex";
