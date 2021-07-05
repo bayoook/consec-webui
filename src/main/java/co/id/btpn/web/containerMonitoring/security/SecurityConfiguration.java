@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ldap.core.DirContextOperations;
@@ -43,6 +44,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     UserappRepository userappRepository;
+
+	@Value("${ldap.urls}")
+    private String ldapUrls;
+
+    @Value("${ldap.base.dn}")
+    private String ldapBaseDn;
+
+	@Value("${ldap.base.groupsearchbase}")
+    private String groupSearchBase;
+ 
+    @Value("${ldap.user.dn.pattern}")
+    private String ldapUserDnPattern;
 	
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -57,17 +70,23 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .withUser("user").password(password).roles("USER");
 
 
+		System.out.println("Connecting to LDAP server " + ldapUrls + ldapBaseDn);
+		System.out.println("LDAP User DN Pattern " + ldapUserDnPattern);
+		System.out.println("LDAP search base " + groupSearchBase);
+
 		auth
 		.ldapAuthentication()
 		.userDetailsContextMapper(userDetailsContextMapper())
-		  .userDnPatterns("uid={0},ou=people")
-		  .groupSearchBase("ou=groups")
+		//  .userDnPatterns("uid={0},ou=people")
+		  .userDnPatterns(ldapUserDnPattern)
+		  .groupSearchBase(groupSearchBase)
 		  .contextSource()
-			.url("ldap://localhost:10389/dc=example,dc=com")
+		//	.url("ldap://localhost:10389/dc=example,dc=com")
+			.url(ldapUrls + ldapBaseDn)
 			.and()
 		  .passwordCompare()
 			//.passwordEncoder(new BCryptPasswordEncoder())
-			.passwordEncoder( new LdapShaPasswordEncoder())
+			//.passwordEncoder( new LdapShaPasswordEncoder())
 			.passwordAttribute("userPassword");
 
 	
