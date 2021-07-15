@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -30,7 +31,8 @@ import lombok.Setter;
 public class Userapp  {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "idgen")
+	@GenericGenerator(name = "idgen", strategy="increment")
 	@Column(name = "user_id")
 	private Long id;
 	@Column(name = "name")

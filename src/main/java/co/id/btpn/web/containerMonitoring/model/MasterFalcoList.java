@@ -1,8 +1,5 @@
 package co.id.btpn.web.containerMonitoring.model;
 
-
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,17 +22,23 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class UserLog {
-    
-    @Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "idgen")
+public class MasterFalcoList {
+	@Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "idgen")
 	@GenericGenerator(name = "idgen", strategy="increment")
-	@Column(name = "userlog_id")
+	@Column(name="falco_list_id")
 	private Long id;
-	@Column(name = "name")
+	@Column(name="name")
 	private String name;
-	@Column(name = "activity")
-	private String activity;
-	@Column(name="logdate")
-	private Date logDate;
+	@Column(name="value",columnDefinition="TEXT")
+	private String value;
+	@Column(name="description",columnDefinition="TEXT")
+	private String description;
+	@Column(name="remark",columnDefinition="TEXT")
+	private String remark;
+	@Column(name="source")
+	private String source;
+
+	
+	
 }

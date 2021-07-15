@@ -6,6 +6,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +24,8 @@ import lombok.Setter;
 @Entity
 public class ConfigAnchore {
 	@Id
-    @GeneratedValue(strategy =  GenerationType.SEQUENCE)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "idgen")
+	@GenericGenerator(name = "idgen", strategy="increment")
 	@Column(name="config_id")
 	private Long id;
 	@Column(name="name")
