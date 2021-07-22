@@ -13,8 +13,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import co.id.btpn.web.containerMonitoring.model.MasterFalcoCondition;
+import co.id.btpn.web.containerMonitoring.model.MasterFalcoPriority;
+import co.id.btpn.web.containerMonitoring.model.MasterFalcoTags;
 import co.id.btpn.web.containerMonitoring.model.RuleFalco;
 import co.id.btpn.web.containerMonitoring.service.RuleFalcoService;
+import co.id.btpn.web.containerMonitoring.service.MasterFalcoConditionService;
+import co.id.btpn.web.containerMonitoring.service.MasterFalcoTagsService ;
+import co.id.btpn.web.containerMonitoring.service.MasterFalcoPriorityService;
 
 
 
@@ -28,6 +34,17 @@ public class RuleFalcoController {
 
 	@Autowired
 	RuleFalcoService ruleFalcoService;
+
+
+	@Autowired
+	MasterFalcoTagsService masterFalcoTagsService;
+
+    @Autowired
+	MasterFalcoConditionService masterFalcoConditionService;
+
+
+    @Autowired
+	MasterFalcoPriorityService masterFalcoPriorityService;
 	
 
     @GetMapping("rulefalcoindex")
@@ -35,12 +52,25 @@ public class RuleFalcoController {
       
     	List <RuleFalco> list= ruleFalcoService.findAll();
     	model.addAttribute("list", list);
+
+        System.out.println("masuk rulefalcoindex");
         
     	return "auth/rulefalco/index";
     }
     
     @GetMapping("rulefalcoadd")
     public String add(RuleFalco ruleFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
+        
+
+        List <MasterFalcoTags> masterFalcoTagsList= masterFalcoTagsService.findAll();
+    	model.addAttribute("masterFalcoTagsList", masterFalcoTagsList);
+
+        List <MasterFalcoCondition> masterFalcoConditionList= masterFalcoConditionService.findAll();
+    	model.addAttribute("masterFalcoConditionList", masterFalcoConditionList);
+
+        List <MasterFalcoPriority> masterFalcoPriorityList= masterFalcoPriorityService.findAll();
+    	model.addAttribute("masterFalcoPriorityList", masterFalcoPriorityList);
+
         
     	
     	return "auth/rulefalco/add";
@@ -60,6 +90,15 @@ public class RuleFalcoController {
     public String edit(RuleFalco ruleFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes , @RequestParam Long id) {
     	
     	ruleFalco = ruleFalcoService.findById(id);
+
+        List <MasterFalcoTags> masterFalcoTagsList= masterFalcoTagsService.findAll();
+    	model.addAttribute("masterFalcoTagsList", masterFalcoTagsList);
+
+        List <MasterFalcoCondition> masterFalcoConditionList= masterFalcoConditionService.findAll();
+    	model.addAttribute("masterFalcoConditionList", masterFalcoConditionList);
+    	
+        List <MasterFalcoPriority> masterFalcoPriorityList= masterFalcoPriorityService.findAll();
+    	model.addAttribute("masterFalcoPriorityList", masterFalcoPriorityList);
        
     	model.addAttribute("ruleFalco", ruleFalco);
         

@@ -22,8 +22,8 @@
 <section layout:fragment="layout_title">
 	<div class=" flex-wrap py-3" >
 		<div class="card-title">
-			 <h3 class="card-label">Edit Falco Policy
-			<span class="d-block text-muted pt-2 font-size-sm">Edit detailed Falco Policy </span></h3> 
+			 <h3 class="card-label">Edit Runtime Policy 
+			<span class="d-block text-muted pt-2 font-size-sm">Edit detailed Runtime Policy </span></h3> 
 		</div>
 	</div>
 
@@ -49,6 +49,46 @@
 										<label class="col-3 col-form-label">Name</label>
 										<div class="col-9">
 											<input class="form-control" type="text" th:field="*{name}" th:value="${policyFalco.name}">
+										</div>
+									</div>
+
+									<div class="form-group row">
+										<label class="col-3 col-form-label">Description</label>
+										<div class="col-9">
+											<textarea class="form-control"  th:field="*{description}" th:value="${policyFalco.description}"></textarea>
+										</div>
+									</div>
+
+									<div class="form-group row">
+										<label class="col-3 col-form-label">Enabled</label>
+										<div class="col-9">
+											<!-- <input class="form-control" type="checkbox" th:field="*{enabled}" th:checked="${policyFalco.enabled}"> -->
+											<span class="switch switch-sm switch-icon">
+												<label>
+												 <input type="checkbox"  th:field="*{enabled}" th:checked="${policyFalco.enabled}"/>
+												 <span></span>
+												</label>
+											</span>
+										</div>
+									</div>
+
+									<div class="form-group row">
+										<label class="col-3 col-form-label">Rules</label>
+										<div class="col-9">
+												<select  class="form-control" formControlName="ruleFalcos" th:field="*{ruleFalcos}" th:value="${policyFalco.ruleFalcos}" multiple="multiple" >
+														<option th:each="obj : ${list}" th:value="${obj.id}"
+																th:text="${obj.name}"></option>
+													
+												</select>
+												
+										</div>
+									</div>
+
+
+									<div class="form-group row">
+										<label class="col-3 col-form-label">Notify to</label>
+										<div class="col-9">
+											<input class="form-control" type="text" th:field="*{notifyTo}" th:value="${policyFalco.notifyTo}">
 										</div>
 									</div>
 									

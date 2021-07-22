@@ -28,14 +28,10 @@ public class MasterFalcoCondition {
 	@GenericGenerator(name = "idgen", strategy="increment")
 	@Column(name="falco_condition_id")
 	private Long id;
-	@Column(name="name")
-	private String name;
-	@Column(name="description",columnDefinition="TEXT")
-	private String description;
-	@Column(name="remark",columnDefinition="TEXT")
+	@Column(name="condition")
+	private String condition;
+	@Column(name="remark")
 	private String remark;
-	@Column(name="source")
-	private String source;
 
 	
 	

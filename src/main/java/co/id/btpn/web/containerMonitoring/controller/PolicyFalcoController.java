@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import co.id.btpn.web.containerMonitoring.model.PolicyFalco;
+import co.id.btpn.web.containerMonitoring.model.RuleFalco;
 import co.id.btpn.web.containerMonitoring.service.PolicyFalcoService;
+import co.id.btpn.web.containerMonitoring.service.RuleFalcoService;
 
 
 
@@ -28,6 +30,9 @@ public class PolicyFalcoController {
 
 	@Autowired
 	PolicyFalcoService policyFalcoService;
+
+	@Autowired
+    RuleFalcoService ruleFalcoService;
 	
 
     @GetMapping("policyfalcoindex")
@@ -42,6 +47,8 @@ public class PolicyFalcoController {
     @GetMapping("policyfalcoadd")
     public String add(PolicyFalco policyFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
         
+        List <RuleFalco> list= ruleFalcoService.findAll();
+    	model.addAttribute("list", list);
     	
     	return "auth/policyfalco/add";
     }
@@ -60,9 +67,10 @@ public class PolicyFalcoController {
     public String edit(PolicyFalco policyFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes , @RequestParam Long id) {
     	
     	policyFalco = policyFalcoService.findById(id);
-       
     	model.addAttribute("policyFalco", policyFalco);
         
+        List <RuleFalco> list= ruleFalcoService.findAll();
+    	model.addAttribute("list", list);
     	
     	return "auth/policyfalco/edit";
     }

@@ -2,9 +2,9 @@ package co.id.btpn.web.containerMonitoring.model;
 
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -14,6 +14,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.JoinColumn;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,7 +44,8 @@ public class PolicyFalco {
 	@Column(name="description",columnDefinition="TEXT")
 	private String description;
 	
-	@ManyToMany(cascade = CascadeType.ALL)
+	@ManyToMany(fetch = FetchType.LAZY)
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JoinTable(name = "policy_rule_falco", joinColumns = @JoinColumn(name = "policy_id"), inverseJoinColumns = @JoinColumn(name = "rule_id"))
 	private Set<RuleFalco> ruleFalcos;
 
@@ -51,5 +54,12 @@ public class PolicyFalco {
 	
 	@Column(name="notify_to")
 	private String notifyTo;
+
+	@Column(name="is_enabled")
+	private boolean enabled;
+
+	public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 	
 }

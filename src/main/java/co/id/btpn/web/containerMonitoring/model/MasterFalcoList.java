@@ -30,14 +30,11 @@ public class MasterFalcoList {
 	private Long id;
 	@Column(name="name")
 	private String name;
-	@Column(name="value",columnDefinition="TEXT")
-	private String value;
-	@Column(name="description",columnDefinition="TEXT")
-	private String description;
-	@Column(name="remark",columnDefinition="TEXT")
-	private String remark;
+	@Column(name="items",columnDefinition="TEXT")
+	private String items;
 	@Column(name="source")
 	private String source;
+
 
 	
 	

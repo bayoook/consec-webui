@@ -155,34 +155,111 @@
 										</ul>
 									</div>
 								</li>
+
 								<li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
 									<a href="javascript:;" class="menu-link menu-toggle">
-										<i class="menu-icon flaticon2-document"></i>
-										<span class="menu-text">Policy</span>
+										<i class="menu-icon flaticon-safe-shield-protection"></i>
+										<span class="menu-text">Policies</span>
 										<i class="menu-arrow"></i>
 									</a>
 									<div class="menu-submenu">
 										<i class="menu-arrow"></i>
 										<ul class="menu-subnav">
-											<li class="menu-item" aria-haspopup="true">
-												<a th:href="@{policyfalcoindex}" class="menu-link">
-													<i class="menu-bullet menu-bullet-dot">
-														<span></span>
-													</i>
-													<span class="menu-text">Falco</span>
-												</a>
-											</li>
-											<!-- <li class="menu-item" aria-haspopup="true">
-												<a th:href="@{policyanchoreindex}" class="menu-link">
-													<i class="menu-bullet menu-bullet-dot">
-														<span></span>
-													</i>
+											<!-- ANCHORE -->
+											<li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+												<a href="javascript:;" class="menu-link menu-toggle">
+													<i class="menu-icon flaticon2-cd"></i>
 													<span class="menu-text">Anchore</span>
+													<i class="menu-arrow"></i>
 												</a>
-											</li> -->
+												<div class="menu-submenu">
+													<i class="menu-arrow"></i>
+													<ul class="menu-subnav">
+														<li class="menu-item" aria-haspopup="true">
+															<a th:href="@{policyanchoreindex}" class="menu-link">
+																<i class="menu-bullet menu-bullet-dot">
+																	<span></span>
+																</i>
+																<span class="menu-text">Scanning Policies</span>
+															</a>
+														</li>
+													</ul>
+												</div>
+											</li>
+											<!-- FALCO -->
+											<li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+												<a href="javascript:;" class="menu-link menu-toggle">
+													<i class="menu-icon flaticon2-document"></i>
+													<span class="menu-text">Falco</span>
+													<i class="menu-arrow"></i>
+												</a>
+												<div class="menu-submenu">
+													<i class="menu-arrow"></i>
+													<ul class="menu-subnav">
+														<li class="menu-item" aria-haspopup="true">
+															<a th:href="@{policyfalcoindex}" class="menu-link">
+																<i class="menu-bullet menu-bullet-dot">
+																	<span></span>
+																</i>
+																<span class="menu-text">Runtime Policies</span>
+															</a>
+														</li>
+														<li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+															<a href="javascript:;" class="menu-link menu-toggle">
+																<i class="menu-bullet menu-bullet-dot">
+																	<span></span>
+																</i>
+																<span class="menu-text">Rules</span>
+																<i class="menu-arrow"></i>
+															</a>
+															<div class="menu-submenu">
+																<i class="menu-arrow"></i>
+																<ul class="menu-subnav">
+																	<li class="menu-item" aria-haspopup="true">
+																		<a th:href="@{rulefalcoindex}" class="menu-link">
+																			<i class="menu-bullet menu-bullet-dot">
+																				<span></span>
+																			</i>
+																			<span class="menu-text">Rules Library</span>
+																		</a>
+																	</li>
+																	<li class="menu-item" aria-haspopup="true">
+																		<a th:href="@{masterfalcoconditionindex}" class="menu-link">
+																			<i class="menu-bullet menu-bullet-dot">
+																				<span></span>
+																			</i>
+																			<span class="menu-text">Falco Condition</span>
+																		</a>
+																	</li>
+																	<li class="menu-item" aria-haspopup="true">
+																		<a th:href="@{masterfalcolistindex}" class="menu-link">
+																			<i class="menu-bullet menu-bullet-dot">
+																				<span></span>
+																			</i>
+																			<span class="menu-text">Falco List</span>
+																		</a>
+																	</li>
+																	<li class="menu-item" aria-haspopup="true">
+																		<a th:href="@{masterfalcomacroindex}" class="menu-link">
+																			<i class="menu-bullet menu-bullet-dot">
+																				<span></span>
+																			</i>
+																			<span class="menu-text">Falco Macros</span>
+																		</a>
+																	</li>
+																</ul>
+															</div>
+														</li>
+													</ul>
+												</div>
+											</li>
 										</ul>
 									</div>
 								</li>
+
+								
+
+								
 								<li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
 									<a href="javascript:;" class="menu-link menu-toggle">
 										<i class="menu-icon flaticon-search-magnifier-interface-symbol"></i>

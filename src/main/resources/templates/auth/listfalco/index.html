@@ -80,16 +80,7 @@ var KTDatatablesBasicPaginations = function() {
 				{
 					targets: 0,
 					width: '5%',
-					render: function ( data, type, row ) {
-							data = data.replace(/<\/?span[^>]*>/g,"");
-							if(data == 'true'){
-
-								return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  checked="'+data+'" disabled/><span></span></label></span>';	
-							}else{
-								return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox" disabled /><span></span></label></span>';	
 					
-							}
-					}
 				},
 				
 				
@@ -156,7 +147,7 @@ function deleteRow(aId){
         if (result.value) {
         	
         	
-        	document.location.href = 'policyfalcodelete?id='+aId;
+        	document.location.href = 'masterfalcolistdelete?id='+aId;
         	
             swal.fire(
                 'Deleted!',
@@ -181,8 +172,8 @@ function deleteRow(aId){
 <section layout:fragment="layout_title">
 	<div class=" flex-wrap py-3" >
 		<div class="card-title">
-			 <h3 class="card-label">Runtime Policies
-			<span class="d-block text-muted pt-2 font-size-sm">Falco Runtime Policy list</span></h3> 
+			 <h3 class="card-label">Falco List
+			<span class="d-block text-muted pt-2 font-size-sm">Policies Falco Lists </span></h3> 
 		</div>
 	</div>
 </section>
@@ -270,7 +261,7 @@ function deleteRow(aId){
 				</div>
 				<!--end::Dropdown-->
 				<!--begin::Button-->
-				<a th:href="@{policyfalcoadd}" class="btn btn-primary font-weight-bolder">
+				<a th:href="@{masterfalcolistadd}" class="btn btn-primary font-weight-bolder">
 				<span class="svg-icon svg-icon-md">
 					<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
 					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
@@ -290,11 +281,10 @@ function deleteRow(aId){
 			<table class="table table-striped- table-bordered table-hover table-checkable" id="kt_table_1">
 				<thead>
 					<tr>
-						<!-- <th class="dt-center">No</th> -->
-						<th>Enabled</th>
+						<th class="dt-center">No</th>
 						<th>Name</th>
-						 <th>Description</th>
-						<!--<th>Status</th> -->
+						<th>Items</th>
+						<!-- <th>Status</th> -->
 						<th class="dt-center">Actions</th>
 					</tr>
 				</thead>
@@ -303,12 +293,10 @@ function deleteRow(aId){
 				<span th:each="listObj : ${list}">
 				
 					<tr>
-						<!-- <td class="dt-center"><span  th:text="${listObjStat.index+1}"></span></td> -->
-						<td><span  th:text="${listObj.enabled}"></span></td>
+						<td class="dt-center"><span  th:text="${listObjStat.index+1}"></span></td>
 						<td><span  th:text="${listObj.name}"></span></td>
-						<td><span  th:text="${listObj.description}"></span></td>
-						<!-- <td><span  th:text="${listObj.roleId.role}"></span></td>
-						<th:block th:if="${listObj.active == 1}">
+						<td><span  th:text="${listObj.items}"></span></td>
+						<!-- <th:block th:if="${listObj.active == 1}">
 							<td><span> Active </span></td>
 						</th:block>
 						<th:block th:if="${listObj.active == 0}">
@@ -317,7 +305,7 @@ function deleteRow(aId){
 						
 						<td class="dt-center" nowrap>
 						
-						<a th:href="@{|policyfalcoedit?id=${listObj.id}|}" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Edit">
+						<a th:href="@{|masterfalcolistedit?id=${listObj.id}|}" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Edit">
 							<i class="la la-edit"></i>
 						</a>
 						<a href="#" th:onclick="'deleteRow('+${listObj.id}+');'" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Deactivated">

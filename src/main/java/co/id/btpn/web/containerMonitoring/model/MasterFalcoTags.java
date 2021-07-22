@@ -22,16 +22,21 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class MasterFalcoMacro {
+public class MasterFalcoTags {
 	@Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "idgen")
 	@GenericGenerator(name = "idgen", strategy="increment")
-	@Column(name="falco_macro_id")
+	@Column(name="tags_id")
 	private Long id;
+
 	@Column(name="name")
 	private String name;
-	@Column(name="condition",columnDefinition="TEXT")
-	private String condition;
+	@Column(name="value",columnDefinition="TEXT")
+	private String value;
+	@Column(name="description",columnDefinition="TEXT")
+	private String description;
+	@Column(name="remark",columnDefinition="TEXT")
+	private String remark;
 	@Column(name="source")
 	private String source;
 
