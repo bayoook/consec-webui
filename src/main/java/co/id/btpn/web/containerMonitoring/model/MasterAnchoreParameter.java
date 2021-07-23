@@ -22,11 +22,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class MasterAnchoreTrigger {
+public class MasterAnchoreParameter {
 	@Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "idgen")
 	@GenericGenerator(name = "idgen", strategy="increment")
-	@Column(name="anchore_trigger_id")
+	@Column(name="anchore_parameter_id")
 	private Long id;
 	@Column(name="name")
 	private String name;
@@ -34,13 +34,8 @@ public class MasterAnchoreTrigger {
 	private String value;
 	@Column(name="description",columnDefinition="TEXT")
 	private String description;
-	@Column(name="remark",columnDefinition="TEXT")
-	private String remark;
-	@Column(name="source")
-	private String source;
-
-	@Column(name="postLink",columnDefinition="TEXT")
-	private String postLink;
-	
-	
+	@Column(name="example",columnDefinition="TEXT")
+	private String example;
+	@Column(name="field_type")
+	private String fieldType;
 }

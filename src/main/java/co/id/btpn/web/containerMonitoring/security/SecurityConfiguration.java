@@ -79,14 +79,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		.userDetailsContextMapper(userDetailsContextMapper())
 		//  .userDnPatterns("uid={0},ou=people")
 		  .userDnPatterns(ldapUserDnPattern)
-		  .groupSearchBase(groupSearchBase)
+		//   .groupSearchBase(groupSearchBase)
 		  .contextSource()
 		//	.url("ldap://localhost:10389/dc=example,dc=com")
 			.url(ldapUrls + ldapBaseDn)
 			.and()
 		  .passwordCompare()
 			//.passwordEncoder(new BCryptPasswordEncoder())
-			//.passwordEncoder( new LdapShaPasswordEncoder())
+			.passwordEncoder( new LdapShaPasswordEncoder())
 			.passwordAttribute("userPassword");
 
 	
@@ -94,7 +94,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	
 
-	
+	@Autowired
+    private CustomLoginListener customLoginListener;
+
+	@Autowired
+    private CustomLoginFailedListener customLoginFailedListener;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -107,6 +111,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/layout").hasAnyAuthority("ADMIN", "USER")
 				.and().csrf().disable().formLogin()
 				.loginPage("/login").failureUrl("/login?error=true")
+				.successHandler(customLoginListener)
+				.failureHandler(customLoginFailedListener)
 				.defaultSuccessUrl("/dashboard")
 				.usernameParameter("username")
 				.passwordParameter("password")
@@ -158,10 +164,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	}
 
 	public List<GrantedAuthority>  loadUserByUsername(String username) throws UsernameNotFoundException {
-        System.out.println(username);
-        Userapp user = (Userapp) userappRepository.findByName(username).get(0);
+        // System.out.println(username);
+		List<Userapp>  userapp = userappRepository.findByName(username);
+      
         List<GrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority(user.getRoleId().getRole()));
+		if(userapp.size()==0){
+			authorities.add(new SimpleGrantedAuthority("USER"));
+		}else{
+			Userapp user = userapp.get(0);
+			authorities.add(new SimpleGrantedAuthority(user.getRoleId().getRole()));
+		}
+		
         return  authorities;
     }
 
