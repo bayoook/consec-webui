@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
+	  xml:lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="layout/base">
@@ -80,7 +81,16 @@ var KTDatatablesBasicPaginations = function() {
 				{
 					targets: 0,
 					width: '5%',
+					render: function ( data, type, row ) {
+							data = data.replace(/<\/?span[^>]*>/g,"");
+							if(data == 'true'){
+
+								return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  checked="'+data+'" disabled/><span></span></label></span>';	
+							}else{
+								return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox" disabled /><span></span></label></span>';	
 					
+							}
+					}
 				},
 				
 				
@@ -172,15 +182,14 @@ function deleteRow(aId){
 <section layout:fragment="layout_title">
 	<div class=" flex-wrap py-3" >
 		<div class="card-title">
-			 <h3 class="card-label">Anchore Policies
-			<span class="d-block text-muted pt-2 font-size-sm">Acnhore policy list</span></h3> 
+			 <h3 class="card-label">Scanning Policies
+			<span class="d-block text-muted pt-2 font-size-sm">Scanning Policy list</span></h3> 
 		</div>
 	</div>
 </section>
 
 
 <section layout:fragment="layout_action">
-	 <!-- <a href="javascript:void(0);" class="btn btn-sm btn-primary" onclick="reloadIframe();" >Refresh</a>  -->
 </section>						
 
 
@@ -191,8 +200,6 @@ function deleteRow(aId){
 		<!-- begin:: Content -->
 		<div class="card-header flex-wrap py-3">
 			<div class="card-title">
-				<!-- <h3 class="card-label">Basic Demo
-				<span class="d-block text-muted pt-2 font-size-sm">sorting &amp; pagination remote datasource</span></h3> -->
 			</div>
 			<div class="card-toolbar" style="text-align: right;">
 				<!--begin::Dropdown-->
@@ -278,14 +285,14 @@ function deleteRow(aId){
 		</div>			
 		<div class="card-body">
 			<!--begin: Datatable -->
-			<table class="table table-striped- table-bordered table-hover table-checkable" id="kt_table_1">
+			<table  class="table table-striped- table-bordered table-hover table-checkable" id="kt_table_1">
+				<caption></caption>
 				<thead>
 					<tr>
-						<th class="dt-center">No</th>
-						<th>Name</th>
-						<!-- <th>Role</th>
-						<th>Status</th> -->
-						<th class="dt-center">Actions</th>
+						<th scope="col" >Enabled</th>
+						<th scope="col">Name</th>
+						<th scope="col">Description</th>
+						<th  scope="col" class="dt-center">Actions</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -293,23 +300,18 @@ function deleteRow(aId){
 				<span th:each="listObj : ${list}">
 				
 					<tr>
-						<td class="dt-center"><span  th:text="${listObjStat.index+1}"></span></td>
+						<td><span  th:text="${listObj.enabled}"></span></td>
 						<td><span  th:text="${listObj.name}"></span></td>
-						<!-- <td><span  th:text="${listObj.roleId.role}"></span></td>
-						<th:block th:if="${listObj.active == 1}">
-							<td><span> Active </span></td>
-						</th:block>
-						<th:block th:if="${listObj.active == 0}">
-							<td><span> Deactivated </span></td>
-						</th:block> -->
+						<td><span  th:text="${listObj.description}"></span></td>
 						
-						<td class="dt-center" nowrap>
+						
+						<td class="dt-center" >
 						
 						<a th:href="@{|policyanchoreedit?id=${listObj.id}|}" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Edit">
-							<i class="la la-edit"></i>
+							<em class="la la-edit"></em>
 						</a>
 						<a href="#" th:onclick="'deleteRow('+${listObj.id}+');'" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Deactivated">
-							<i class="la la-minus-square"></i>
+							<em class="la la-minus-square"></em>
 						</a>
 						
 						</td>
