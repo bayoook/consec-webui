@@ -69,13 +69,6 @@ var KTDatatablesBasicPaginations = function() {
                 
             ],
 			columnDefs: [
-				{
-					targets: -1,
-					title: 'Actions',
-					width: '10%',
-					orderable: false,
-					
-				},
 				
 				{
 					targets: 0,
@@ -172,8 +165,8 @@ function deleteRow(aId){
 <section layout:fragment="layout_title">
 	<div class=" flex-wrap py-3" >
 		<div class="card-title">
-			 <h3 class="card-label">Scan Registry
-			<span class="d-block text-muted pt-2 font-size-sm">Scaned Registry List </span></h3> 
+			 <h3 class="card-label">Registry
+			<span class="d-block text-muted pt-2 font-size-sm">Registry List </span></h3> 
 		</div>
 	</div>
 </section>
@@ -282,19 +275,32 @@ function deleteRow(aId){
 				<thead>
 					<tr>
 						<th class="dt-center">No</th>
+						<th>Registry</th>
 						<th>Name</th>
+						<th>Verify</th>
+						<th>User Id</th>
+						<th>Type</th>
+						<th>User</th>
+						<th>Last Updated</th>
+						<th>Created At</th>
 						<!-- <th>Role</th>
 						<th>Status</th> -->
-						<th class="dt-center">Actions</th>
 					</tr>
 				</thead>
 				<tbody>
 				
 				<span th:each="listObj : ${list}">
-				
+
 					<tr>
 						<td class="dt-center"><span  th:text="${listObjStat.index+1}"></span></td>
-						<td><span  th:text="${listObj.name}"></span></td>
+						<td><span  th:text="${listObj.registry}"></span></td>
+						<td><span  th:text="${listObj.registryName}"></span></td>
+						<td><span  th:text="${listObj.registryVerify}"></span></td>
+						<td><span  th:text="${listObj.userId}"></span></td>
+						<td><span  th:text="${listObj.registryType}"></span></td>
+						<td><span  th:text="${listObj.registryUser}"></span></td>
+						<td><span  th:text="${#temporals.format(listObj.instanceLastUpatedDate , 'dd-MM-yyyy HH:mm:ss')}"></span></td>
+						<td><span  th:text="${#temporals.format(listObj.instanceCreatedAtDate , 'dd-MM-yyyy HH:mm:ss')}"></span></td>
 						<!-- <td><span  th:text="${listObj.roleId.role}"></span></td>
 						<th:block th:if="${listObj.active == 1}">
 							<td><span> Active </span></td>
@@ -303,16 +309,7 @@ function deleteRow(aId){
 							<td><span> Deactivated </span></td>
 						</th:block> -->
 						
-						<td class="dt-center" nowrap>
-						
-						<a th:href="@{|rulefalcoedit?id=${listObj.id}|}" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Edit">
-							<i class="la la-edit"></i>
-						</a>
-						<a href="#" th:onclick="'deleteRow('+${listObj.id}+');'" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Deactivated">
-							<i class="la la-minus-square"></i>
-						</a>
-						
-						</td>
+					
 					</tr>
 				
 				</span>

@@ -256,7 +256,12 @@
 									</div>
 								</li>
 
-								
+								<li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
+									<a th:href="@{customrulefalcoindex}" class="menu-link menu-toggle">
+										<em class="menu-icon flaticon-alert"></em>
+										<span class="menu-text">Alerting</span>
+									</a>
+								</li>
 
 								
 								<li class="menu-item menu-item-submenu" aria-haspopup="true" data-menu-toggle="hover">
@@ -281,14 +286,14 @@
 													<em class="menu-bullet menu-bullet-dot">
 														<span></span>
 													</em>
-													<span class="menu-text">Registry Scan</span>
+													<span class="menu-text">Registry</span>
 												</a>
 											</li>
 										</ul>
 									</div>
 								</li>
 								<li class="menu-item" aria-haspopup="true">
-									<a th:href="@{dashboard}" class="menu-link">
+									<a th:href="@{servicestatusindex}" class="menu-link">
 										<em class="menu-icon flaticon-computer"></em>
 										<span class="menu-text">Service Status</span>
 									</a>
@@ -516,6 +521,36 @@
 		<!--begin::Page Scripts(used by this page)-->
 		<script th:src="@{assets/js/pages/widgets.js}"></script>
 
+		<script>
+
+			var loc = window.location
+
+			function getParam(name) {
+				var url = new URL(loc.href)
+				return url.searchParams.get(name)
+			}
+
+			function handleAjax(url, type, data, success, error) {
+				$.ajax({
+					url: url,
+					type: type || 'POST',
+					data: Object.assign({ token: '' }, data || {}),
+					contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+					success: function(res, status, xhr) {
+						if (success) {
+							success(res)
+						}
+					},
+					error: function(res) {
+						if (error) {
+							error(res)
+						}
+						console.log('Error:', url, res)
+					}
+				})
+			}
+
+		</script>
 		<th:block layout:fragment="js-extra"/>
 		<!--end::Page Scripts-->
 	</body>

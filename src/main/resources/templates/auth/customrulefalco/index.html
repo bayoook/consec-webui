@@ -15,9 +15,36 @@
 		<!--begin::Page Vendors(used by this page) -->
 		<script th:src="@{/assets/plugins/custom/datatables/datatables.bundle.js}" type="text/javascript"></script>
 		<!--end::Page Vendors -->
-<script>
+
+<script th:inline="text">
 
 
+
+function updateRow(enabledVar,actionIdVar,idVar,type){
+	
+
+	if(type==1){
+		handleAjax('/customrulefalcoupdate', 'POST', { enabled:enabledVar, actionId:actionIdVar.value, id:idVar  }, function(res) {
+			swal.fire(
+				'Success!',
+				'Your data has been updated.',
+				'success'
+			)
+
+		});
+	}else{
+
+		var enabledInt = enabledVar.checked ? 1:0;
+		handleAjax('/customrulefalcoupdate', 'POST', { enabled:enabledInt, actionId:actionIdVar, id:idVar  }, function(res) {
+			swal.fire(
+				'Success!',
+				'Your data has been updated.',
+				'success'
+			)
+
+		});
+	}
+}
 
 var KTDatatablesBasicPaginations = function() {
 
@@ -26,6 +53,7 @@ var KTDatatablesBasicPaginations = function() {
 
 		// begin first table
 		table.DataTable({
+			dom: 'rt',
 			responsive: true,
 			pagingType: 'full_numbers',
 			buttons: [
@@ -70,9 +98,89 @@ var KTDatatablesBasicPaginations = function() {
             ],
 			columnDefs: [
 				{
-					targets: 0,
+						targets: 0,
+						width: '5%',
+				},
+				{
+					targets: 2,
 					width: '5%',
+					render: function ( data, type, row ) {
+
+							
+							const optionAction = JSON.parse('[(${action})]');
+							 data = data.replace(/<\/?span[^>]*>/g,"");
+							 var enableRow = row[3].replace(/<\/?span[^>]*>/g,"");
+							 var idRow = row[0].replace(/<\/?span[^>]*>/g,"");
+
+
+
+							 var $select = $("<select onchange='updateRow("+enableRow+",this,"+idRow+",1)'></select>", {});
+
+							 
+							 optionAction.forEach(function(obj) { 
+								var $option = $("<option></option>", {
+									"text": obj.action_name,
+									"value": obj.id
+								});
+								if (data == obj.action_name) {
+									$option.attr("selected", "selected")
+								}
+								$select.append($option);
+
+							 });
+
+							
+                            return $select.prop("outerHTML");
+
+
+					}
+				},
+				{
+					targets: 4,
+					width: '5%',
+					render: function ( data, type, row ) {
+
+							 const optionAction = JSON.parse('[(${action})]');
+
+							 var idAction = '';
+						     var actionRow = row[2].replace(/<\/?span[^>]*>/g,"");
+							 var idRow = row[0].replace(/<\/?span[^>]*>/g,"");
+							 var enabledRow = row[3].replace(/<\/?span[^>]*>/g,"");
+
+							 optionAction.forEach(function(obj) { 
+
+								if (actionRow == obj.action_name) {
+									idAction = obj.id;
+								}
+
+							});
+
+							if(enabledRow == 1){
+								return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  checked="'+enabledRow+'" onclick="updateRow(this,\''+idAction+'\','+idRow+')" /><span></span></label></span>';	
+							}else{
+								return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  onclick="updateRow(this,\''+idAction+'\','+idRow+')" /><span></span></label></span>';	
 					
+							}
+					}
+				},
+				{
+					targets: 3,
+					title: 'Status',
+					render: function(e, a, t, n) {
+
+						var estr = e.replace(/<\/?span[^>]*>/g,"");
+
+
+						var status = {
+							0: {'title': 'Disabled', 'class': ' label-light-danger'},
+							1: {'title': 'Enabled', 'class': ' label-light-success'},
+						};
+						if (typeof status[estr] === 'undefined') {
+							return data;
+						}
+						return '<span class="label label-lg font-weight-bold' + status[estr].class + ' label-inline">' + status[estr].title + '</span>';
+
+					}
 				},
 				
 				
@@ -124,68 +232,19 @@ jQuery(document).ready(function() {
    });
 
 
+
+
 });
 
 
-function deleteRow(aId){
-	
-    swal.fire({
-        title: 'Are you sure want to delete this data ?',
-        text: "You won't be able to revert this!",
-        type: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!'
-    }).then(function(result) {
-        if (result.value) {
-        	
-        	
-        	document.location.href = 'rulefalcodelete?id='+aId;
-        	
-            swal.fire(
-                'Deleted!',
-                'Your file has been deleted.',
-                'success'
-            )
-        }
-    });
-}
 
-
-function addScan(tagVar){
-	handleAjax('/scanondemandadd', 'POST', { tag: tagVar  }, function(res) {
-			return res;
-		});
-}
-
-
-function addDialogScan(){
-	Swal.fire({
-		title: 'Submit image full tag to scan',
-		input: 'text',
-		inputAttributes: {
-			autocapitalize: 'off'
-		},
-		showCancelButton: true,
-		confirmButtonText: 'Scan',
-		showLoaderOnConfirm: true,
-		preConfirm: (tag) => {
-			return addScan(tag);
-		},
-		allowOutsideClick: () => !Swal.isLoading()
-		}).then((result) => {
-		if (result.isConfirmed) {
-			swal.fire(
-				'Success!',
-				'Your image has been requested to be analize.',
-				'success'
-			)
-		}
-		})
-}
 
 
 
 </script>
+
+
+
 
 </th:block>
 
@@ -193,8 +252,8 @@ function addDialogScan(){
 <section layout:fragment="layout_title">
 	<div class=" flex-wrap py-3" >
 		<div class="card-title">
-			 <h3 class="card-label">Scan On-Demand
-			<span class="d-block text-muted pt-2 font-size-sm">Scaned On-Demand Image List</span></h3> 
+			 <h3 class="card-label">Alerting 
+			<span class="d-block text-muted pt-2 font-size-sm">Alerting list</span></h3> 
 		</div>
 	</div>
 </section>
@@ -281,20 +340,6 @@ function addDialogScan(){
 					<!--end::Dropdown Menu-->
 				</div>
 				<!--end::Dropdown-->
-				<!--begin::Button-->
-				<a onclick="addDialogScan();" class="btn btn-primary font-weight-bolder">
-				<span class="svg-icon svg-icon-md">
-					<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
-					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
-						<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-							<rect x="0" y="0" width="24" height="24" />
-							<circle fill="#000000" cx="9" cy="15" r="6" />
-							<path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z" fill="#000000" opacity="0.3" />
-						</g>
-					</svg>
-					<!--end::Svg Icon-->
-				</span>New Scan</a>
-				<!--end::Button-->
 			</div>
 		</div>			
 		<div class="card-body">
@@ -303,30 +348,30 @@ function addDialogScan(){
 				<thead>
 					<tr>
 						<th class="dt-center">No</th>
-						<th>Fulltag</th>
-						<!-- <th>Registry</th>
-						<th>Repo</th>
-						<th>Tag</th> -->
-						<th>Origins</th>
-						<th>Image Status</th> 
-						<th>Analysis Status</th> 
-						<th>Analyzed at</th>
+						<th>Name</th>
+						<th>Action</th>
+						<th>Status</th>
+						<th>Enable/Disable</th>
 					</tr>
 				</thead>
 				<tbody>
 				
 				<span th:each="listObj : ${list}">
 				
+					
 					<tr>
-						<td class="dt-center"><span  th:text="${listObjStat.index+1}"></span></td>
-						<td><span  th:text="${listObj.imageDetail[0].fulltag}"></span></td>
-						<!-- <td><span  th:text="${listObj.imageDetail[0].registry}"></span></td>
-						<td><span  th:text="${listObj.imageDetail[0].repo}"></span></td>
-						<td><span  th:text="${listObj.imageDetail[0].tag}"></span></td> -->
-						<td><span  th:text="${listObj.annotations.origins}"></span></td>
-						<td><span  th:text="${listObj.imageStatus}"></span></td>
-						<td><span  th:text="${listObj.analysisStatus}"></span></td>
-						<td><span  th:text="${#temporals.format(listObj.instanceAnalyzedAtDate , 'dd-MM-yyyy HH:mm:ss')}"></span></td>
+						<td class="dt-center"><span  th:text="${listObj.id}"></span></td>
+						<td><span  th:text="${listObj.ruleName}"></span></td>
+						<td><span  th:text="${listObj.actionName}"></span></td>
+						<td><span  th:text="${listObj.enabled}"></span></td>
+						<td><span></span></td>
+						<!--<th:block th:if="${listObj.active == 1}">
+							<td><span> Active </span></td>
+						</th:block>
+						<th:block th:if="${listObj.active == 0}">
+							<td><span> Deactivated </span></td>
+						</th:block> -->
+						
 					</tr>
 				
 				</span>

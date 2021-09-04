@@ -70,6 +70,28 @@ var KTDatatablesBasicPaginations = function() {
             ],
 			columnDefs: [
 				{
+					targets: 8,
+					width: '5%',
+					render: function(e, a, t, n) {
+
+						var estr = e.replace(/<\/?span[^>]*>/g,"");
+						var clasS = 'label-light-success';
+						
+						if(estr == 'Terminated'){
+							clasS = 'label-light-danger';
+						}
+						if(estr == 'Waiting'){
+							clasS = 'label-light-warning';
+						}
+
+						return '<span class="label label-lg font-weight-bold '+clasS+' label-inline">'+estr+'</span>';
+						
+
+					}
+					
+				},
+				
+				{
 					targets: 0,
 					width: '5%',
 					
@@ -151,41 +173,12 @@ function deleteRow(aId){
 }
 
 
-function addScan(tagVar){
-	handleAjax('/scanondemandadd', 'POST', { tag: tagVar  }, function(res) {
-			return res;
-		});
-}
-
-
-function addDialogScan(){
-	Swal.fire({
-		title: 'Submit image full tag to scan',
-		input: 'text',
-		inputAttributes: {
-			autocapitalize: 'off'
-		},
-		showCancelButton: true,
-		confirmButtonText: 'Scan',
-		showLoaderOnConfirm: true,
-		preConfirm: (tag) => {
-			return addScan(tag);
-		},
-		allowOutsideClick: () => !Swal.isLoading()
-		}).then((result) => {
-		if (result.isConfirmed) {
-			swal.fire(
-				'Success!',
-				'Your image has been requested to be analize.',
-				'success'
-			)
-		}
-		})
-}
-
 
 
 </script>
+
+
+
 
 </th:block>
 
@@ -193,8 +186,8 @@ function addDialogScan(){
 <section layout:fragment="layout_title">
 	<div class=" flex-wrap py-3" >
 		<div class="card-title">
-			 <h3 class="card-label">Scan On-Demand
-			<span class="d-block text-muted pt-2 font-size-sm">Scaned On-Demand Image List</span></h3> 
+			 <h3 class="card-label">Service Status
+			<span class="d-block text-muted pt-2 font-size-sm">Falco & Anchore Service Status List</span></h3> 
 		</div>
 	</div>
 </section>
@@ -281,20 +274,7 @@ function addDialogScan(){
 					<!--end::Dropdown Menu-->
 				</div>
 				<!--end::Dropdown-->
-				<!--begin::Button-->
-				<a onclick="addDialogScan();" class="btn btn-primary font-weight-bolder">
-				<span class="svg-icon svg-icon-md">
-					<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
-					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
-						<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-							<rect x="0" y="0" width="24" height="24" />
-							<circle fill="#000000" cx="9" cy="15" r="6" />
-							<path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z" fill="#000000" opacity="0.3" />
-						</g>
-					</svg>
-					<!--end::Svg Icon-->
-				</span>New Scan</a>
-				<!--end::Button-->
+				
 			</div>
 		</div>			
 		<div class="card-body">
@@ -303,14 +283,19 @@ function addDialogScan(){
 				<thead>
 					<tr>
 						<th class="dt-center">No</th>
-						<th>Fulltag</th>
-						<!-- <th>Registry</th>
-						<th>Repo</th>
-						<th>Tag</th> -->
-						<th>Origins</th>
-						<th>Image Status</th> 
-						<th>Analysis Status</th> 
-						<th>Analyzed at</th>
+						<th>Name Space</th>
+						<th>Pod Name</th>
+						<th>IP</th>
+						<th>Host IP</th>
+						<th>Service Account</th>
+						<th>Ready</th>
+						<th>Restart Count</th>
+						<th>Status</th>
+
+						
+						<!-- <th>Role</th>
+						<th>Status</th> -->
+						<!-- <th class="dt-center">Actions</th> -->
 					</tr>
 				</thead>
 				<tbody>
@@ -319,14 +304,48 @@ function addDialogScan(){
 				
 					<tr>
 						<td class="dt-center"><span  th:text="${listObjStat.index+1}"></span></td>
-						<td><span  th:text="${listObj.imageDetail[0].fulltag}"></span></td>
-						<!-- <td><span  th:text="${listObj.imageDetail[0].registry}"></span></td>
-						<td><span  th:text="${listObj.imageDetail[0].repo}"></span></td>
-						<td><span  th:text="${listObj.imageDetail[0].tag}"></span></td> -->
-						<td><span  th:text="${listObj.annotations.origins}"></span></td>
-						<td><span  th:text="${listObj.imageStatus}"></span></td>
-						<td><span  th:text="${listObj.analysisStatus}"></span></td>
-						<td><span  th:text="${#temporals.format(listObj.instanceAnalyzedAtDate , 'dd-MM-yyyy HH:mm:ss')}"></span></td>
+						<td><span  th:text="${listObj.metadata.namespace}"></span></td>
+						<td><span  th:text="${listObj.metadata.name}"></span></td>
+						<td><span  th:text="${listObj.status.podIP}"></span></td>
+						<td><span  th:text="${listObj.status.hostIP}"></span></td>
+						<td><span  th:text="${listObj.spec.serviceAccountName}"></span></td>
+						<td><span  th:text="${listObj.containerReadyStatus}"></span></td>
+						<td><span  th:text="${listObj.countRestart}"></span></td>
+
+						
+						<!-- <td><span  th:text="${listObj.status.containerStatuses}"></span></td> -->
+						<td><th:block th:each="tag : ${listObj.status.containerStatuses}"><div>
+						
+							<th:block th:if="${tag.state.running}">
+								<span  th:text="${tag.state.running} ? 'Running' : ''  "></span>
+							</th:block>
+							<th:block th:if="${tag.state.terminated}">
+								<span  th:text="${tag.state.terminated} ? 'Terminated' : ''  "></span>
+							</th:block>
+							<th:block th:if="${tag.state.waiting}">
+								<span  th:text="${tag.state.waiting} ? 'Waiting' : ''  "></span>
+							</th:block>
+							
+						</div></th:block></td>
+						
+						<!-- <td><span  th:text="${listObj.roleId.role}"></span></td>
+						<th:block th:if="${listObj.active == 1}">
+							<td><span> Active </span></td>
+						</th:block>
+						<th:block th:if="${listObj.active == 0}">
+							<td><span> Deactivated </span></td>
+						</th:block> -->
+						
+						<!-- <td class="dt-center" nowrap>
+						
+						<a th:href="@{|rulefalcoedit?id=${listObj.id}|}" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Edit">
+							<i class="la la-edit"></i>
+						</a>
+						<a href="#" th:onclick="'deleteRow('+${listObj.id}+');'" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Deactivated">
+							<i class="la la-minus-square"></i>
+						</a>
+						
+						</td> -->
 					</tr>
 				
 				</span>
