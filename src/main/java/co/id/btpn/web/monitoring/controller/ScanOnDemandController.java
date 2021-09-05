@@ -93,8 +93,6 @@ public class ScanOnDemandController {
     		tag =  allParams.get("tag");
     	}
 
-        System.out.println("request scan >>> "+tag);
-
         ImagePostScan post = new ImagePostScan();
         post.setTag(tag);
         post.setAnnotations(annotations);
@@ -104,10 +102,6 @@ public class ScanOnDemandController {
         
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBasicAuth(anchoreUsername, anchorePassword);
-
-        // Map<String, String> bodyParamMap = new HashMap<String, String>();
-        // bodyParamMap.put("action_id", actionId );
-        // bodyParamMap.put("enabled", enabled);
 
         HttpEntity requestEntity = new HttpEntity(post,headers);
 

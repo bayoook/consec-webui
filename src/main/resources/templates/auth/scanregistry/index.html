@@ -75,6 +75,13 @@ var KTDatatablesBasicPaginations = function() {
 					width: '5%',
 					
 				},
+				{
+					targets: -1,
+					title: 'Actions',
+					width: '10%',
+					orderable: false,
+					
+				},
 				
 				
 			],
@@ -140,7 +147,7 @@ function deleteRow(aId){
         if (result.value) {
         	
         	
-        	document.location.href = 'rulefalcodelete?id='+aId;
+        	document.location.href = 'scanregistrydelete?rname='+aId;
         	
             swal.fire(
                 'Deleted!',
@@ -254,7 +261,7 @@ function deleteRow(aId){
 				</div>
 				<!--end::Dropdown-->
 				<!--begin::Button-->
-				<a th:href="@{rulefalcoadd}" class="btn btn-primary font-weight-bolder">
+				<a th:href="@{scanregistryadd}" class="btn btn-primary font-weight-bolder">
 				<span class="svg-icon svg-icon-md">
 					<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
 					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
@@ -283,8 +290,7 @@ function deleteRow(aId){
 						<th>User</th>
 						<th>Last Updated</th>
 						<th>Created At</th>
-						<!-- <th>Role</th>
-						<th>Status</th> -->
+						<th class="dt-center">Actions</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -301,14 +307,16 @@ function deleteRow(aId){
 						<td><span  th:text="${listObj.registryUser}"></span></td>
 						<td><span  th:text="${#temporals.format(listObj.instanceLastUpatedDate , 'dd-MM-yyyy HH:mm:ss')}"></span></td>
 						<td><span  th:text="${#temporals.format(listObj.instanceCreatedAtDate , 'dd-MM-yyyy HH:mm:ss')}"></span></td>
-						<!-- <td><span  th:text="${listObj.roleId.role}"></span></td>
-						<th:block th:if="${listObj.active == 1}">
-							<td><span> Active </span></td>
-						</th:block>
-						<th:block th:if="${listObj.active == 0}">
-							<td><span> Deactivated </span></td>
-						</th:block> -->
-						
+					
+						<td class="dt-center" nowrap>
+							<a th:href="@{|scanregistryedit?rname=${listObj.registry}|}" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Edit">
+								<i class="la la-edit"></i>
+							</a>
+							<a href="#" th:onclick="deleteRow('[(${listObj.registry})]')" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Deactivated">
+								<i class="la la-minus-square"></i>
+							</a>
+							
+						</td>
 					
 					</tr>
 				

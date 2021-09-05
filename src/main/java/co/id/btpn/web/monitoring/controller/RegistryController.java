@@ -64,9 +64,6 @@ public class RegistryController {
    
     @GetMapping("scanregistryindex") 
     public String scanRegistry(Model model, @ModelAttribute("attributes") Map<?,?> attributes) { 
-       
-
-
          
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -84,45 +81,101 @@ public class RegistryController {
         
         return "auth/scanregistry/index"; 
     }
+
+
+    @GetMapping("scanregistryadd")
+    public String add(Registry registry, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
+        
+    	
+    	return "auth/scanregistry/add";
+    }
+
+
+    @PostMapping("scanregistryadd")
+    public String addPost(Registry registry, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
+        
+    	
+        HttpHeaders headers = new HttpHeaders();
+        
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBasicAuth(anchoreUsername, anchorePassword);
+
+
+        Gson gson = new Gson();
+        String json = gson.toJson(registry);
+
+        HttpEntity requestEntity = new HttpEntity(json,headers);
+        ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/registries", HttpMethod.POST, requestEntity, String.class);
+              
+    	return "redirect:scanregistryindex";
+    }
+
+
+    @GetMapping("scanregistryedit")
+    public String edit(Registry registry, Model model, @ModelAttribute("attributes") Map<?,?> attributes, @RequestParam String rname) {
+        
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBasicAuth(anchoreUsername, anchorePassword);
+
+        Map<String, String> bodyParamMap = new HashMap<String, String>();
+
+        HttpEntity requestEntity = new HttpEntity(bodyParamMap,headers);
+        
+        ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/registries/"+rname, HttpMethod.GET, requestEntity, String.class);
+
+        Registry[] imageList = new Gson().fromJson(responseEntity.getBody().toString(), Registry[].class);
+
+        model.addAttribute("registry", imageList[0]); 
+
+    	
+    	return "auth/scanregistry/edit";
+    }
+
+    @PostMapping("scanregistryedit")
+    public String addEditPost(Registry registry, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
+        
+    	
+        HttpHeaders headers = new HttpHeaders();
+        
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBasicAuth(anchoreUsername, anchorePassword);
+
+
+        Gson gson = new Gson();
+        String json = gson.toJson(registry);
+
+        HttpEntity requestEntity = new HttpEntity(json,headers);
+        ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/registries/"+registry.getRegistry(), HttpMethod.PUT, requestEntity, String.class);
+              
+    	return "redirect:scanregistryindex";
+    }
+
+
+    @GetMapping("scanregistrydelete")
+    public String delete(Registry registry, Model model, @ModelAttribute("attributes") Map<?,?> attributes , @RequestParam String rname) {
+          	
+
+        HttpHeaders headers = new HttpHeaders();
+        
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBasicAuth(anchoreUsername, anchorePassword);
+
+        registry = new Registry();
+        registry.setRegistry(rname);
+
+        Gson gson = new Gson();
+        String json = gson.toJson(registry);
+
+        HttpEntity requestEntity = new HttpEntity(json,headers);
+        ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/registries/"+registry.getRegistry(), HttpMethod.DELETE, requestEntity, String.class);
+              
+    	
+    	
+    	return "redirect:scanregistryindex";
+    }
     
-
-
-    // @PostMapping("customrulefalcoupdate")
-    // public  @ResponseBody String updateCustomRule( @RequestParam Map<String,String> allParams ) {
-
-    // 	String enabled = "";
-    // 	String actionId = "";
-    // 	String id = "";
-
-    //     if (allParams.containsKey("id")){
-    // 		id =  allParams.get("id");
-    // 	}
-
-    // 	if (allParams.containsKey("actionId")){
-    // 		actionId =  allParams.get("actionId");
-    // 	}
-
-    // 	if (allParams.containsKey("enabled")){
-    // 		enabled =  allParams.get("enabled");
-    // 	}
-
-
-    //     HttpHeaders headers = new HttpHeaders();
-    //     headers.setContentType(MediaType.APPLICATION_JSON);
-
-    //     headers.setBasicAuth(falcoUsername, falcoPassword);
-
-    //     Map<String, String> bodyParamMap = new HashMap<String, String>();
-    //     bodyParamMap.put("action_id", actionId );
-    //     bodyParamMap.put("enabled", enabled);
-
-    //     HttpEntity requestEntity = new HttpEntity(bodyParamMap,headers);
-
-    //     ResponseEntity<String> responseEntity =  restTemplate.exchange(falcoUrl+"/rule/action/"+id, HttpMethod.PUT, requestEntity, String.class);
-      
-    // 	return responseEntity.getBody();
-    // }
-
     
     
     

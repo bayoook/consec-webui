@@ -40,6 +40,9 @@ public String registryName;
 @SerializedName("registry_verify")
 @Expose
 public Boolean registryVerify;
+@SerializedName("registry_pass")
+@Expose
+public String registryPass;
 
 public  ZonedDateTime getInstanceCreatedAtDate(){
         

@@ -6,24 +6,44 @@
 
 
 <th:block layout:fragment="css-extra">
-
-<style>
-
-</style>
-
+	<link th:href="@{assets/plugins/custom/password-strength-meter-master/dist/password.min.css}" rel="stylesheet" type="text/css" />
 </th:block>
 
 
 <th:block layout:fragment="js-extra">
+	<script th:src="@{assets/plugins/custom/password-strength-meter-master/dist/password.min.js}"></script>
 
+
+
+	
+	<script>
+
+		jQuery(document).ready(function($) {
+
+
+				$('#submitaction').prop("disabled", true);
+				
+				$('#registryPass').password().on('password.score', function (e, score) {
+					
+					console.log("score >> ",score)
+					if (score > 75) {
+					  $('#submitaction').prop("disabled", false);
+					} else {
+					  $('#submitaction').prop("disabled", true);
+					}
+				});
+
+
+		});
+	</script>
 </th:block>
 
 
 <section layout:fragment="layout_title">
 	<div class=" flex-wrap py-3" >
 		<div class="card-title">
-			 <h3 class="card-label">Edit Falco Rule
-			<span class="d-block text-muted pt-2 font-size-sm">Edit detailed Falco Rule </span></h3> 
+			 <h3 class="card-label">Edit Registry 
+			<span class="d-block text-muted pt-2 font-size-sm">Edit detailed Registry</span></h3> 
 		</div>
 	</div>
 
@@ -32,99 +52,72 @@
 
 <section layout:fragment="layout_content">
 		<!-- begin:: Content -->
+		<form  id="kt_form"  th:action="@{/scanregistryedit}" th:object="${registry}" method="post" >
 					
 		<div class="card-body">
-			<form  id="kt_form"  th:action="@{/rulefalcoedit}" th:object="${ruleFalco}" method="post" >
-
-				<input type="hidden" class="form-control" formControlName="id" name="id" id="id"
-				th:field="*{id}">        
-
 					<div class="row">
 						<div class="col-xl-2"></div>
 						<div class="col-xl-8">
 							<div class="kt-section kt-section--first">
 								<div class="kt-section__body">
-									<!-- <h3 class="kt-section__title kt-section__title-lg">User Info:</h3> -->
 									<div class="form-group row">
 										<label class="col-3 col-form-label">Name</label>
 										<div class="col-9">
-											<input class="form-control" type="text" th:field="*{name}" th:value="${ruleFalco.name}">
-										</div>
-									</div>
-
-
-									<div class="form-group row">
-										<label class="col-3 col-form-label">Description</label>
-										<div class="col-9">
-											<textarea class="form-control" type="text" th:field="*{description}"> </textarea>
+											<input class="form-control" type="text" th:field="*{registryName}" th:value="${registry.registryName}" readonly>
 										</div>
 									</div>
 
 									<div class="form-group row">
-										<label class="col-3 col-form-label">Condition</label>
+										<label class="col-3 col-form-label">Registry</label>
 										<div class="col-9">
-												<select  class="form-control" formControlName="masterFalcoCondition" th:field="*{masterFalcoCondition}" >
-														<option th:each="obj : ${masterFalcoConditionList}" th:value="${obj.id}"
-																th:text="${obj.condition}"></option>
-													
+											<input class="form-control" type="text" th:field="*{registry}"  th:value="${registry.registry}" readonly>
+										</div>
+									</div>
+
+									<div class="form-group row">
+										<label class="col-3 col-form-label">Registry Type</label>
+										<div class="col-9">
+											<input class="form-control" type="text" th:field="*{registryType}" th:value="${registry.registryType}">
+										</div>
+									</div>
+
+									<div class="form-group row">
+										<label class="col-3 col-form-label">User</label>
+										<div class="col-9">
+											<input class="form-control" autocomplete="off" type="text" th:field="*{registryUser}" th:value="${registry.registryUser}">
+										</div>
+									</div>
+
+									<div class="form-group row">
+										<label class="col-3 col-form-label">Password</label>
+										<div class="col-9">
+											<input class="form-control"  autocomplete="new-password" type="password" th:field="*{registryPass}" th:value="${registry.registryPass}">
+										</div>
+									</div>
+
+									<div class="form-group row">
+										<label class="col-3 col-form-label">Verify</label>
+										<div class="col-9">
+												<select  class="form-control" formControlName="registryVerify" th:field="*{registryVerify}" th:value="${registry.registryVerify}">
+														<option  value="true"> True </option>
+														<option  value="false"> False </option>
 												</select>
 										</div>
 									</div>
 
-									<div class="form-group row">
-										<label class="col-3 col-form-label">Output</label>
-										<div class="col-9">
-											<textarea class="form-control" type="text" th:field="*{output}"> </textarea>
-										</div>
-									</div>
 
 
-									<div class="form-group row">
-										<label class="col-3 col-form-label">Priority</label>
-										<div class="col-9">
-												<select  class="form-control" formControlName="masterFalcoPriority" th:field="*{masterFalcoPriority}" >
-														<option th:each="obj : ${masterFalcoPriorityList}" th:value="${obj.id}"
-																th:text="${obj.name}"></option>
-													
-												</select>
-										</div>
-									</div>
-
-
-									<div class="form-group row">
-										<label class="col-3 col-form-label">Tags</label>
-										<div class="col-9">
-												<select  class="form-control" formControlName="masterFalcoTags" th:field="*{masterFalcoTags}" multiple="multiple">
-														<option th:each="obj : ${masterFalcoTagsList}" th:value="${obj.id}"
-																th:text="${obj.name}"></option>
-													
-												</select>
-										</div>
-									</div>
-									
-									<!-- <div class="form-group row">
-										<label class="col-3 col-form-label">Role Name</label>
-										<div class="col-9">
-											
-											<select  class="form-control" formControlName="roleId"
-													name="roleId" id="roleId" th:field="*{roleId}" th:value="${userapp.roleId}">
-													<option th:each="role : ${roleList}" th:value="${role.id}"
-															th:text="${role.role}"></option>
-												
-											</select>
-										</div>
-									</div> -->
 								</div>
 							</div>	
 							</div>
 						<div class="col-xl-2"></div>
 					</div>
-			</form>
+			
 		</div>
 		<div class="flex-wrap py-3" style="border-top: 1px solid #EBEDF3;padding: 2rem 2.25rem;">
 			<div class="card-toolbar" style="text-align: right;">
 				<!--begin::Button-->
-				<a th:href="@{/rulefalcoindex}" class="btn btn-light-primary font-weight-bolder mr-2">
+				<a th:href="@{/scanregistryindex}" class="btn btn-light-primary font-weight-bolder mr-2">
 					<span class="svg-icon svg-icon-md">
 						<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
 						<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
@@ -138,7 +131,7 @@
 					</span>Back</a>
 				<!--end::Button-->
 				<!--begin::Button-->
-				<a href="javascript:;" onclick="document.getElementById('kt_form').submit();" class="btn btn-primary font-weight-bolder mr-2">
+				<button type="submit"  id="submitaction" class="btn btn-primary font-weight-bolder mr-2">
 				<span class="svg-icon svg-icon-md">
 					<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
 					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
@@ -149,12 +142,12 @@
 						</g>
 					</svg>
 					<!--end::Svg Icon-->
-				</span>Save</a>
+				</span>Save</button>
 				<!--end::Button-->
 			</div>
 		</div>
 
-
+	</form>
 
 
 </section>
