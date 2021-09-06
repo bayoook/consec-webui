@@ -1,20 +1,29 @@
 package co.id.btpn.web.monitoring.controller;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import com.google.gson.Gson;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.client.RestTemplate;
 
-import co.id.btpn.web.monitoring.model.PolicyAnchore;
-import co.id.btpn.web.monitoring.service.PolicyAnchoreService;
+import co.id.btpn.web.monitoring.model.policy.anchore.Policies;
+
 
 
 
@@ -26,21 +35,46 @@ import co.id.btpn.web.monitoring.service.PolicyAnchoreService;
 @SessionAttributes("attributes")
 public class PolicyAnchoreController {
 
-	@Autowired
-	PolicyAnchoreService policyAnchoreService;
+	
+    @Value("${anchore.url}")
+    private String anchoreUrl;
+
+    @Value("${anchore.username}")
+    private String anchoreUsername;
+
+    @Value("${anchore.password}")
+    private String anchorePassword;
+
+    @Autowired
+    private RestTemplate restTemplate;
 	
 
     @GetMapping("policyanchoreindex")
-    public String index(PolicyAnchore policyAnchore, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
+    public String index(Policies policies, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
       
-    	List <PolicyAnchore> list= policyAnchoreService.findAll();
-    	model.addAttribute("list", list);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBasicAuth(anchoreUsername, anchorePassword);
+
+        Map<String, String> bodyParamMap = new HashMap<String, String>();
+
+        HttpEntity requestEntity = new HttpEntity(bodyParamMap,headers);
+        
+        ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/policies", HttpMethod.GET, requestEntity, String.class);
+    
+        Policies[] policyList = new Gson().fromJson(responseEntity.getBody().toString(), Policies[].class);
+
+        model.addAttribute("list", policyList);
+
+        Gson gson = new Gson();
+        String json = gson.toJson(policyList);
+
         
     	return "auth/policyanchore/index";
     }
     
     @GetMapping("policyanchoreadd")
-    public String add(PolicyAnchore policyAnchore, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
+    public String add(Policies policies, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
         
     	
     	return "auth/policyanchore/add";
@@ -48,41 +82,132 @@ public class PolicyAnchoreController {
 
 
     @PostMapping("policyanchoreadd")
-    public String addPost(PolicyAnchore policyAnchore, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
+    public String addPost(Policies policies, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
         
-    	policyAnchoreService.save(policyAnchore);;
+    
+        HttpHeaders headers = new HttpHeaders();
+        
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBasicAuth(anchoreUsername, anchorePassword);
+
+
+        Gson gson = new Gson();
+        String json = gson.toJson(policies);
+
+        HttpEntity requestEntity = new HttpEntity(json,headers);
+        ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/policies", HttpMethod.POST, requestEntity, String.class);
+              
     	
     	return "redirect:policyanchoreindex";
     }
     
     
     @GetMapping("policyanchoreedit")
-    public String edit(PolicyAnchore policyAnchore, Model model, @ModelAttribute("attributes") Map<?,?> attributes , @RequestParam Long id) {
+    public String edit(Policies policies, Model model, @ModelAttribute("attributes") Map<?,?> attributes , @RequestParam String id) {
     	
-    	policyAnchore = policyAnchoreService.findById(id);
-       
-    	model.addAttribute("policyAnchore", policyAnchore);
+    	HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBasicAuth(anchoreUsername, anchorePassword);
+
+        Map<String, String> bodyParamMap = new HashMap<String, String>();
+
+        HttpEntity requestEntity = new HttpEntity(bodyParamMap,headers);
         
-    	
+        ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/policies/"+id, HttpMethod.GET, requestEntity, String.class);
+
+        Policies[] imageList = new Gson().fromJson(responseEntity.getBody().toString(), Policies[].class);
+
+        model.addAttribute("policies", imageList[0]); 
+
+
+
     	return "auth/policyanchore/edit";
     }
 
 
     @PostMapping("policyanchoreedit")
-    public String editPost(PolicyAnchore policyAnchore, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
+    public String editPost(Policies policies, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
         
-    	policyAnchoreService.update(policyAnchore);
+    
+        HttpHeaders headers = new HttpHeaders();
+        
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBasicAuth(anchoreUsername, anchorePassword);
+
+
+        Gson gson = new Gson();
+        String json = gson.toJson(policies);
+
+        HttpEntity requestEntity = new HttpEntity(json,headers);
+        ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/policies/"+policies.getPolicyId(), HttpMethod.PUT, requestEntity, String.class);
+              
     	
     	return "redirect:policyanchoreindex";
     }
     
     
     @GetMapping("policyanchoredelete")
-    public String delete(PolicyAnchore policyAnchore, Model model, @ModelAttribute("attributes") Map<?,?> attributes , @RequestParam Long id) {
+    public String delete(Policies policies, Model model, @ModelAttribute("attributes") Map<?,?> attributes , @RequestParam String id) {
           	
-    	policyAnchoreService.deleteById(id);
+        HttpHeaders headers = new HttpHeaders();
+        
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBasicAuth(anchoreUsername, anchorePassword);
+
+        policies = new Policies();
+        policies.setPolicyId(id);
+
+        Gson gson = new Gson();
+        String json = gson.toJson(policies);
+
+        HttpEntity requestEntity = new HttpEntity(json,headers);
+        ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/policies/"+policies.getPolicyId(), HttpMethod.DELETE, requestEntity, String.class);
     	
     	return "redirect:policyanchoreindex";
+    }
+
+
+
+    @PostMapping("policyanchoreupdate")
+    public  @ResponseBody String updateActive( @RequestParam Map<String,String> allParams ) {
+
+    	Boolean enabled = false;
+    	String id = "";
+
+        if (allParams.containsKey("id")){
+    		id =  allParams.get("id");
+    	}
+
+
+    	if (allParams.containsKey("enabled")){
+    		enabled =  Boolean.parseBoolean(allParams.get("enabled"));
+    	}
+        
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        headers.setBasicAuth(anchoreUsername, anchorePassword);
+        Map<String, String> bodyParamMap = new HashMap<String, String>();
+        HttpEntity requestEntity = new HttpEntity(bodyParamMap,headers);
+
+        //load data before update
+        ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/policies/"+id, HttpMethod.GET, requestEntity, String.class);
+        Policies[] imageList = new Gson().fromJson(responseEntity.getBody().toString(), Policies[].class);
+
+
+        Policies temp = imageList[0];
+        temp.setActive(enabled);
+
+        Gson gson = new Gson();
+        String json = gson.toJson(temp);
+        String jsonw = gson.toJson(imageList);
+
+        //save/update data
+        requestEntity = new HttpEntity(json,headers);
+        responseEntity =  restTemplate.exchange(anchoreUrl+"/policies/"+id, HttpMethod.PUT, requestEntity, String.class);
+    
+    	return responseEntity.getBody();
     }
         
     @ModelAttribute("attributes")

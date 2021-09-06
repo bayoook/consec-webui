@@ -16,7 +16,25 @@
 		<!--begin::Page Vendors(used by this page) -->
 		<script th:src="@{/assets/plugins/custom/datatables/datatables.bundle.js}" type="text/javascript"></script>
 		<!--end::Page Vendors -->
-<script>
+
+		<script th:inline="text">
+
+
+
+			function updateRow(enabledVar,policyIdVar){
+				
+			
+				var enabledInt = enabledVar.checked ? true:false;
+				handleAjax('/policyanchoreupdate', 'POST', { enabled:enabledInt, id:policyIdVar  }, function(res) {
+					swal.fire(
+						'Success!',
+						'Your data has been updated.',
+						'success'
+					)
+		
+				});
+				
+			}
 
 
 
@@ -71,6 +89,11 @@ var KTDatatablesBasicPaginations = function() {
             ],
 			columnDefs: [
 				{
+					targets: 2,
+					width: '50%',
+					
+				},
+				{
 					targets: -1,
 					title: 'Actions',
 					width: '10%',
@@ -82,13 +105,13 @@ var KTDatatablesBasicPaginations = function() {
 					targets: 0,
 					width: '5%',
 					render: function ( data, type, row ) {
+
+						    var policyId = row[4].replace(/<\/?span[^>]*>/g,"");
 							data = data.replace(/<\/?span[^>]*>/g,"");
 							if(data == 'true'){
-
-								return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  checked="'+data+'" disabled/><span></span></label></span>';	
+								return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  checked="'+data+'" onclick="updateRow(this,\''+policyId+'\')" /><span></span></label></span>';	
 							}else{
-								return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox" disabled /><span></span></label></span>';	
-					
+								return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  onclick="updateRow(this,\''+policyId+'\')" /><span></span></label></span>';	
 							}
 					}
 				},
@@ -289,10 +312,15 @@ function deleteRow(aId){
 				<caption></caption>
 				<thead>
 					<tr>
-						<th scope="col" >Enabled</th>
-						<th scope="col">Name</th>
-						<th scope="col">Description</th>
-						<th  scope="col" class="dt-center">Actions</th>
+						<th  >Active</th>
+						<th >Name</th>
+						<th >Description</th>
+						<th >Source</th>
+						<th >Policy ID</th>
+						<th >User ID</th>
+						<th >Created At</th>
+						<th >Last Updated</th>
+						<th   class="dt-center">Actions</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -300,18 +328,25 @@ function deleteRow(aId){
 				<span th:each="listObj : ${list}">
 				
 					<tr>
-						<td><span  th:text="${listObj.enabled}"></span></td>
+						<td><span  th:text="${listObj.active}"></span></td>
 						<td><span  th:text="${listObj.name}"></span></td>
 						<td><span  th:text="${listObj.description}"></span></td>
+						<td><span  th:text="${listObj.policySource}"></span></td>
+						<td><span  th:text="${listObj.policyId}"></span></td>
+						<td><span  th:text="${listObj.userId}"></span></td>
+						<td><span  th:text="${#temporals.format(listObj.instanceCreatedAtDate , 'dd-MM-yyyy HH:mm:ss')}"></span></td>
+						<td><span  th:text="${#temporals.format(listObj.instanceLastUpdatedDate , 'dd-MM-yyyy HH:mm:ss')}"></span></td>
+					
 						
 						
 						<td class="dt-center" >
 						
-						<a th:href="@{|policyanchoreedit?id=${listObj.id}|}" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Edit">
+						<a th:href="@{|policyanchoreedit?id=${listObj.policyId}|}" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Edit">
 							<em class="la la-edit"></em>
 						</a>
-						<a href="#" th:onclick="'deleteRow('+${listObj.id}+');'" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Deactivated">
-							<em class="la la-minus-square"></em>
+						
+						<a href="#" th:onclick="deleteRow('[(${listObj.policyId})]')" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Deactivated">
+							<i class="la la-minus-square"></i>
 						</a>
 						
 						</td>
