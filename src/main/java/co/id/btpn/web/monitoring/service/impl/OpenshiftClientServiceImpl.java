@@ -26,6 +26,7 @@ public class OpenshiftClientServiceImpl implements OpenshiftClientService{
 
 	    private static final Logger logger = LoggerFactory.getLogger(OpenshiftClientServiceImpl.class);
 
+        private KubernetesClient client =null;
         @Value("${openshift.url}")
         private String openshiftUrl;
         
@@ -60,6 +61,10 @@ public class OpenshiftClientServiceImpl implements OpenshiftClientService{
         System.setProperty("kubernetes.trust.certificates", "true");
 
 
+        if(client!=null){
+
+
+        }
         try (KubernetesClient client =  new DefaultKubernetesClient(new ConfigBuilder()
             .withMasterUrl(openshiftUrl)
             .withUsername(kubernetesAuthBasicUsername)

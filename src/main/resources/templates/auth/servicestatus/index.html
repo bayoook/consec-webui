@@ -75,8 +75,10 @@ var KTDatatablesBasicPaginations = function() {
 					render: function(e, a, t, n) {
 
 						var estr = e.replace(/<\/?span[^>]*>/g,"");
+						 estr = estr.replace(/^<div[^>]*>|<\/div>$/g, '');
+						 estr = estr.replace(/\s/g, '');
 						var clasS = 'label-light-success';
-						
+						console.log("estr >?",estr)
 						if(estr == 'Terminated'){
 							clasS = 'label-light-danger';
 						}

@@ -15,9 +15,24 @@
 		<!--begin::Page Vendors(used by this page) -->
 		<script th:src="@{/assets/plugins/custom/datatables/datatables.bundle.js}" type="text/javascript"></script>
 		<!--end::Page Vendors -->
-<script>
+
+<script th:inline="text">
 
 
+
+function updateRow(enabledVar,rowName){
+	
+		var enabledInt = enabledVar.checked ? true:false;
+		handleAjax('/runtimealertupdate', 'POST', { enabled:enabledInt, name:rowName }, function(res) {
+			swal.fire(
+				'Success!',
+				'Your data has been updated.',
+				'success'
+			)
+
+		});
+	
+}
 
 var KTDatatablesBasicPaginations = function() {
 
@@ -71,18 +86,32 @@ var KTDatatablesBasicPaginations = function() {
             ],
 			columnDefs: [
 				{
-					targets: -1,
-					title: 'Actions',
-					width: '10%',
-					orderable: false,
-					
+						targets: 0,
+						width: '5%',
+				},
+				{
+					targets:  2 ,
+					visible: false,
+					searchable: false
 				},
 				
 				{
-					targets: 0,
+					targets: 3,
 					width: '5%',
+					render: function ( data, type, row ) {
+
+						     var name = row[2].replace(/<\/?span[^>]*>/g,"");
+						     var actionRow = row[3].replace(/<\/?span[^>]*>/g,"");
+
+							if(actionRow == 'true'){
+								return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  checked="'+actionRow+'" onclick="updateRow(this,\''+name+'\')" /><span></span></label></span>';	
+							}else{
+								return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  onclick="updateRow(this,\''+name+'\')" /><span></span></label></span>';	
 					
+							}
+					}
 				},
+				
 				
 				
 			],
@@ -133,31 +162,11 @@ jQuery(document).ready(function() {
    });
 
 
+
+
 });
 
 
-function deleteRow(aId){
-	
-    swal.fire({
-        title: 'Are you sure want to delete this data ?',
-        text: "You won't be able to revert this!",
-        type: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!'
-    }).then(function(result) {
-        if (result.value) {
-        	
-        	
-        	document.location.href = 'configfalcodelete?id='+aId;
-        	
-            swal.fire(
-                'Deleted!',
-                'Your file has been deleted.',
-                'success'
-            )
-        }
-    });
-}
 
 
 
@@ -173,8 +182,8 @@ function deleteRow(aId){
 <section layout:fragment="layout_title">
 	<div class=" flex-wrap py-3" >
 		<div class="card-title">
-			 <h3 class="card-label">Falco Configs
-			<span class="d-block text-muted pt-2 font-size-sm">Falco Config list</span></h3> 
+			 <h3 class="card-label">Runtime Alerting 
+			<span class="d-block text-muted pt-2 font-size-sm">Runtime Alerting list</span></h3> 
 		</div>
 	</div>
 </section>
@@ -261,19 +270,6 @@ function deleteRow(aId){
 					<!--end::Dropdown Menu-->
 				</div>
 				<!--end::Dropdown-->
-				<!--begin::Button-->
-				<!-- <a th:href="@{configfalcoadd}" class="btn btn-primary font-weight-bolder">
-				<span class="svg-icon svg-icon-md">
-					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
-						<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-							<rect x="0" y="0" width="24" height="24" />
-							<circle fill="#000000" cx="9" cy="15" r="6" />
-							<path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z" fill="#000000" opacity="0.3" />
-						</g>
-					</svg>
-					
-				</span>New Record</a> -->
-				<!--end::Button-->
 			</div>
 		</div>			
 		<div class="card-body">
@@ -282,35 +278,29 @@ function deleteRow(aId){
 				<thead>
 					<tr>
 						<th class="dt-center">No</th>
+						<th>Description</th>
 						<th>Name</th>
-						<!-- <th>Role</th>
-						<th>Status</th> -->
-						<th class="dt-center">Actions</th>
+						<th>Enable/Disable</th>
 					</tr>
 				</thead>
 				<tbody>
 				
 				<span th:each="listObj : ${list}">
 				
+					
 					<tr>
 						<td class="dt-center"><span  th:text="${listObjStat.index+1}"></span></td>
+						<td><span  th:text="${listObj.desc}"></span></td>
 						<td><span  th:text="${listObj.name}"></span></td>
-						<!-- <td><span  th:text="${listObj.roleId.role}"></span></td>
-						<th:block th:if="${listObj.active == 1}">
+						<td><span  th:text="${listObj.value}"></span></td>
+						
+						<!--<th:block th:if="${listObj.active == 1}">
 							<td><span> Active </span></td>
 						</th:block>
 						<th:block th:if="${listObj.active == 0}">
 							<td><span> Deactivated </span></td>
 						</th:block> -->
 						
-						<td class="dt-center" nowrap>
-						
-						<a th:href="@{|configfalcoedit?id=${listObj.name}|}" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Edit">			
-							<i class="la la-edit"></i>
-						</a>
-					
-						
-						</td>
 					</tr>
 				
 				</span>

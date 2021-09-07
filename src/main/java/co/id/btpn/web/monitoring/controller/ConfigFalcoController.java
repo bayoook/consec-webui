@@ -1,5 +1,6 @@
 package co.id.btpn.web.monitoring.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import co.id.btpn.web.monitoring.model.ConfigFalco;
+import co.id.btpn.web.monitoring.model.policy.anchore.Param;
 import co.id.btpn.web.monitoring.service.ConfigFalcoService;
+import co.id.btpn.web.monitoring.service.OpenshiftClientService;
+import io.fabric8.kubernetes.api.model.ConfigMap;
+import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
+import io.fabric8.kubernetes.api.model.ConfigMapList;
+import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
+import io.fabric8.kubernetes.client.dsl.Resource;
 
 
 
@@ -28,14 +36,36 @@ public class ConfigFalcoController {
 
 	@Autowired
 	ConfigFalcoService configFalcoService;
+
+    @Autowired
+    OpenshiftClientService openshiftClientService;
+
+	String PRETY_PREFIX = "<pre class='language-yaml'><code>";
+	String PRETY_SUFIX = "</code></pre>";
 	
 
     @GetMapping("configfalcoindex")
     public String index(ConfigFalco  configFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
       
-    	List <ConfigFalco> list= configFalcoService.findAll();
-    	model.addAttribute("list", list);
+    	// List <ConfigFalco> list= configFalcoService.findAll();
+    	// model.addAttribute("list", list);
         
+
+       ConfigMap cm =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("falco-duplicate").get();
+       Map<String,String> map = cm.getData();
+    
+
+       List <Param> listObj =  new ArrayList <>();
+
+        for (Map.Entry<String, String> entry : map.entrySet()){
+            Param temp = new Param();
+            temp.setName(entry.getKey());
+            temp.setValue(entry.getValue());
+            listObj.add(temp);
+        }
+
+        model.addAttribute("list", listObj);
+
     	return "auth/configfalco/index";
     }
     
@@ -57,11 +87,21 @@ public class ConfigFalcoController {
     
     
     @GetMapping("configfalcoedit")
-    public String edit(ConfigFalco  configFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes , @RequestParam Long id) {
+    public String edit(Param  paramFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes , @RequestParam String id) {
     	
-    	configFalco = configFalcoService.findById(id);
+    	// configFalco = configFalcoService.findById(id);
     	
-    	model.addAttribute("configFalco", configFalco);
+    	// model.addAttribute("configFalco", configFalco);
+
+
+       ConfigMap cm =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("falco-duplicate").get();
+       Map<String,String> map = cm.getData();
+
+       paramFalco.setName(id);
+       paramFalco.setValue(PRETY_PREFIX+map.get(id)+PRETY_SUFIX);
+        
+
+        model.addAttribute("configFalco", paramFalco);
         
     	
     	return "auth/configfalco/edit";
@@ -69,11 +109,30 @@ public class ConfigFalcoController {
 
 
     @PostMapping("configfalcoedit")
-    public String editPost(ConfigFalco  configFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
+    public String editPost(Param  paramFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
         
        
-    	configFalcoService.update(configFalco);
-    	
+    	//configFalcoService.update(configFalco);
+
+
+        NonNamespaceOperation<ConfigMap, ConfigMapList, Resource<ConfigMap>>  cm =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev");
+       Map<String,String> map = cm.withName("falco-duplicate").get().getData();
+
+
+    
+       map.put(paramFalco.getName(), paramFalco.getValue().replace(PRETY_PREFIX, "").replace(PRETY_SUFIX, ""));
+   
+       ConfigMap newConfigMap = new ConfigMapBuilder().withNewMetadata()
+       .withName("falco-duplicate")
+       .withNamespace("consec-dev")
+       .addToLabels("app", "falco")
+       .endMetadata()
+       .addToData(map)
+       .build();
+
+       
+       cm.createOrReplace(newConfigMap);
+
     	return "redirect:configfalcoindex";
     }
     

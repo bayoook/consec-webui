@@ -41,14 +41,13 @@
 		<!-- begin:: Content -->
 					
 		<div class="card-body">
-			<form  id="kt_form"  th:action="@{/configfalcoedit}" th:object="${configFalco}" method="post" >
+			<form  id="kt_form"  th:action="@{/configfalcoedit}" th:object="${param}" method="post" >
 
-				<input type="hidden" class="form-control" formControlName="id" name="id" id="id"
-				th:field="*{id}">        
+				<!-- <input type="hidden" class="form-control" formControlName="id" name="id" id="id"
+				th:field="*{id}">         -->
 
 					<div class="row">
-						<div class="col-xl-2"></div>
-						<div class="col-xl-8">
+						<div class="col-xl-12">
 							<div class="kt-section kt-section--first">
 								<div class="kt-section__body">
 									<!-- <h3 class="kt-section__title kt-section__title-lg">User Info:</h3> -->
@@ -60,10 +59,9 @@
 									</div>
 									
 									<div class="form-group row">
-										<label class="col-3 col-form-label">Config</label>
-										<div class="col-9">
+										<div class="col-12">
 											
-											<textarea id="kt-tinymce-ta" name="kt-tinymce-ta"  th:field="*{config}"  th:value="${configFalco.config}"></textarea>
+											<textarea id="kt-tinymce-ta" name="kt-tinymce-ta"  th:field="*{value}"  th:value="${configFalco.value}"></textarea>
 											
 										</div>
 									</div>
@@ -91,6 +89,7 @@
 					</span>Back</a>
 				<!--end::Button-->
 				<!--begin::Button-->
+				<th:block th:if="${configFalco.name == 'falco_rules.local.yaml'}">
 				<a href="javascript:;" onclick="document.getElementById('kt_form').submit();" class="btn btn-primary font-weight-bolder mr-2">
 				<span class="svg-icon svg-icon-md">
 					<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
@@ -103,6 +102,7 @@
 					</svg>
 					<!--end::Svg Icon-->
 				</span>Save</a>
+				<th:block>
 				<!--end::Button-->
 			</div>
 		</div>

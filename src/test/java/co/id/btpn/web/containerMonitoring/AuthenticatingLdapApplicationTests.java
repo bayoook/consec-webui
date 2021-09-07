@@ -21,26 +21,6 @@ public class AuthenticatingLdapApplicationTests {
 	@Autowired
 	private MockMvc mockMvc;
 
-	// @Test 
-	// public void loginWithValidUserThenAuthenticated() throws Exception {
-	// 	FormLoginRequestBuilder login = formLogin()
-	// 		.user("ben")
-	// 		.password("benspassword");
-
-	// 	mockMvc.perform(login)
-	// 		.andExpect(authenticated());
-	// }
-
-
-	// @Test
-	// public void loginWithValidUserThenAuthenticated2() throws Exception {
-	// 	FormLoginRequestBuilder login = formLogin()
-	// 		.user("bob")
-	// 		.password("bobspassword");
-
-	// 	mockMvc.perform(login)
-	// 		.andExpect(authenticated());
-	// }
 
 	@Test
 	public void loginWithValidUserThenAuthenticated3() throws Exception {
@@ -53,13 +33,4 @@ public class AuthenticatingLdapApplicationTests {
 	}
 	
 
-	// @Test
-	// public void loginWithInvalidUserThenUnauthenticated() throws Exception {
-	// 	FormLoginRequestBuilder login = formLogin()
-	// 		.user("invalid")
-	// 		.password("invalidpassword");
-
-	// 	mockMvc.perform(login)
-	// 		.andExpect(unauthenticated());
-	// }
 }

@@ -21,4 +21,5 @@ public class Param {
     @Expose
     public String value;
 
+    public String desc;
 }

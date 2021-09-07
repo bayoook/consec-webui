@@ -1,10 +1,16 @@
 package co.id.btpn.web.monitoring.controller;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -32,6 +38,10 @@ import org.springframework.web.client.RestTemplate;
 
 import co.id.btpn.web.monitoring.model.CustomRuleActionFalco;
 import co.id.btpn.web.monitoring.model.CustomRuleFalco;
+import co.id.btpn.web.monitoring.model.policy.anchore.Param;
+import co.id.btpn.web.monitoring.service.OpenshiftClientService;
+import io.fabric8.kubernetes.api.model.ConfigMap;
+import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 
 
 
@@ -41,7 +51,7 @@ import co.id.btpn.web.monitoring.model.CustomRuleFalco;
  */
 @Controller
 @SessionAttributes("attributes")
-public class CustomRuleFalcoController {
+public class AlertingController {
 
 
     @Value("${falco.url}")
@@ -55,9 +65,13 @@ public class CustomRuleFalcoController {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    OpenshiftClientService openshiftClientService;
+
 	
 
-    @GetMapping("customrulefalcoindex")
+    @GetMapping("imagealertindex")
     public String index(CustomRuleFalco customRuleFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
       
     
@@ -81,12 +95,12 @@ public class CustomRuleFalcoController {
         model.addAttribute("action",(String)responseEntity.getBody() );
 
         
-    	return "auth/customrulefalco/index";
+    	return "auth/alerting/image";
     }
     
 
 
-    @PostMapping("customrulefalcoupdate")
+    @PostMapping("imagealertupdate")
     public  @ResponseBody String updateCustomRule( @RequestParam Map<String,String> allParams ) {
 
     	String enabled = "";
@@ -123,6 +137,87 @@ public class CustomRuleFalcoController {
     }
 
     
+    @GetMapping("runtimealertindex")
+    public String runtimeIndex(CustomRuleFalco customRuleFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) throws IOException {
+      
+       ConfigMap cmcustom =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("mail-options-duplicate").get();
+       Properties properties = new Properties();
+       InputStream stream = new ByteArrayInputStream(cmcustom.getData().get("mail-options.incl").getBytes(StandardCharsets.UTF_8));
+       properties.load(stream);
+
+       List <Param> listObj =  new ArrayList <>();
+
+        Param falcoNOTIFY = new Param();
+        Param falcoACTION = new Param();
+        Param imageScanNOTIFY = new Param();
+       
+        falcoNOTIFY.setDesc("Falco Notify Alert");
+        falcoNOTIFY.setName("FalcoNOTIFY");
+        falcoNOTIFY.setValue(properties.getProperty("FalcoNOTIFY"));
+        falcoACTION.setDesc("Falco Action Alert");
+        falcoACTION.setName("FalcoACTION");
+        falcoACTION.setValue(properties.getProperty("FalcoACTION"));
+        imageScanNOTIFY.setDesc("Image Scan Notify Alert");
+        imageScanNOTIFY.setName("ImageScanNOTIFY");
+        imageScanNOTIFY.setValue(properties.getProperty("ImageScanNOTIFY"));
+
+        listObj.add(falcoNOTIFY);
+        listObj.add(falcoACTION);
+        listObj.add(imageScanNOTIFY);
+
+        model.addAttribute("list", listObj);
+
+        
+    	return "auth/alerting/runtime";
+    }
+
+
+
+
+    @PostMapping("runtimealertupdate")
+    public  @ResponseBody String updateCustomRule2( @RequestParam Map<String,String> allParams ) throws IOException {
+
+    	String enabled = "";
+    	String name = "";
+
+
+    	if (allParams.containsKey("name")){
+    		name =  allParams.get("name");
+    	}
+
+    	if (allParams.containsKey("enabled")){
+    		enabled =  allParams.get("enabled");
+    	}
+
+
+        ConfigMap cmcustom =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("mail-options-duplicate").get();
+        Properties properties = new Properties();
+        InputStream stream = new ByteArrayInputStream(cmcustom.getData().get("mail-options.incl").getBytes(StandardCharsets.UTF_8));
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        
+        properties.load(stream);
+        properties.setProperty(name, enabled);
+        properties.store(byteArrayOutputStream, "");
+
+        String out = new String(byteArrayOutputStream.toByteArray(), StandardCharsets.UTF_8);
+
+
+        Map <String,String> configMapData = new HashMap<String,String>();
+        configMapData.put("mail-options.incl", out);
+
+        ConfigMap newConfigMap = new ConfigMapBuilder().withNewMetadata()
+            .withName("mail-options-duplicate")
+            .withNamespace("consec-dev")
+            .addToLabels("app", "falco")
+            .endMetadata()
+            .addToData(configMapData)
+            .build();
+    
+        openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").createOrReplace(newConfigMap);
+
+    	return "OK";
+    }
+
     
     
         
