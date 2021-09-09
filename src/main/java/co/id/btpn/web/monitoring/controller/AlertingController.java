@@ -42,6 +42,9 @@ import co.id.btpn.web.monitoring.model.policy.anchore.Param;
 import co.id.btpn.web.monitoring.service.OpenshiftClientService;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
+import io.fabric8.kubernetes.api.model.ConfigMapList;
+import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
+import io.fabric8.kubernetes.client.dsl.Resource;
 
 
 
@@ -69,10 +72,16 @@ public class AlertingController {
     @Autowired
     OpenshiftClientService openshiftClientService;
 
+
+	String PRETY_PREFIX = "<pre class='language-yaml'><code>";
+	String PRETY_SUFIX = "</code></pre>";
+    String PRETY_PREFIX_ = "<pre class=\"language-yaml\"><code>";
+	
+
 	
 
     @GetMapping("imagealertindex")
-    public String index(CustomRuleFalco customRuleFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
+    public String index(CustomRuleFalco customRuleFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) throws IOException {
       
     
         HttpHeaders headers = new HttpHeaders();
@@ -87,10 +96,30 @@ public class AlertingController {
         ResponseEntity  responseEntity =  restTemplate.exchange(falcoUrl+"/rule/action", HttpMethod.GET, requestEntity, String.class);
         CustomRuleFalco[] customRuleFalcoList = new Gson().fromJson(responseEntity.getBody().toString(), CustomRuleFalco[].class);
 
+
+
+        ConfigMap cmcustom =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("mail-options-duplicate").get();
+        Properties properties = new Properties();
+        InputStream stream = new ByteArrayInputStream(cmcustom.getData().get("mail-options.incl").getBytes(StandardCharsets.UTF_8));
+        properties.load(stream);
+ 
+ 
+        CustomRuleFalco imageScanNOTIFY = new CustomRuleFalco();
+
+        
+         imageScanNOTIFY.setId(5);
+         imageScanNOTIFY.setActionName("ImageScanNOTIFY");
+         imageScanNOTIFY.setRuleName("Image Scan");
+         imageScanNOTIFY.setEnabled(Boolean.parseBoolean(properties.getProperty("ImageScanNOTIFY")) ? 1 : 0);
+         
+         
+         customRuleFalcoList = addX(customRuleFalcoList.length, customRuleFalcoList , imageScanNOTIFY );
+
         model.addAttribute("list", customRuleFalcoList);
 
 
         responseEntity =  restTemplate.exchange(falcoUrl+"/action", HttpMethod.GET, requestEntity, String.class);
+        
      
         model.addAttribute("action",(String)responseEntity.getBody() );
 
@@ -218,6 +247,65 @@ public class AlertingController {
     	return "OK";
     }
 
+
+    public  CustomRuleFalco[] addX(int n, CustomRuleFalco arr[], CustomRuleFalco x)
+    {
+        int i;
+  
+        // create a new array of size n+1
+        CustomRuleFalco newarr[] = new CustomRuleFalco[n + 1];
+  
+        for (i = 0; i < n; i++)
+            newarr[i] = arr[i];
+  
+        newarr[n] = x;
+  
+        return newarr;
+    }
+
+
+
+    @GetMapping("emailconfig")
+    public String edit(Param  paramFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes , @RequestParam String id) {
+    	
+
+       ConfigMap cm =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("mail-recipient-list").get();
+       Map<String,String> map = cm.getData();
+
+       paramFalco.setName(id);
+       paramFalco.setValue(PRETY_PREFIX+map.get(id)+PRETY_SUFIX);
+        
+
+        model.addAttribute("configFalco", paramFalco);
+        
+    	
+    	return "auth/alerting/edit";
+    }
+
+
+    @PostMapping("emailconfig")
+    public String editPost(Param  paramFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
+        
+       
+        NonNamespaceOperation<ConfigMap, ConfigMapList, Resource<ConfigMap>>  cm =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev");
+       Map<String,String> map = cm.withName("mail-recipient-list").get().getData();
+
+
+    
+       map.put(paramFalco.getName(), paramFalco.getValue().replace(PRETY_PREFIX, "").replace(PRETY_SUFIX, "").replace(PRETY_PREFIX_, ""));
+   
+       ConfigMap newConfigMap = new ConfigMapBuilder().withNewMetadata()
+       .withName("mail-recipient-list")
+       .withNamespace("consec-dev")
+       .endMetadata()
+       .addToData(map)
+       .build();
+
+       
+       cm.createOrReplace(newConfigMap);
+
+    	return "redirect:imagealertindex";
+    }
     
     
         

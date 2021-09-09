@@ -14,10 +14,12 @@
 <th:block layout:fragment="js-extra">
 		<!--begin::Page Vendors(used by this page) -->
 		<script th:src="@{/assets/plugins/custom/datatables/datatables.bundle.js}" type="text/javascript"></script>
+		<script th:src="@{assets/plugins/custom/datatables/datetime-moment.js}"  type="text/javascript"></script>
+		
 		<!--end::Page Vendors -->
 <script>
 
-
+$.fn.dataTable.moment( 'DD-MM-YYYY HH:mm:ss' );
 
 var KTDatatablesBasicPaginations = function() {
 
@@ -26,6 +28,7 @@ var KTDatatablesBasicPaginations = function() {
 
 		// begin first table
 		table.DataTable({
+			order: [5, 'asc' ],
 			responsive: true,
 			pagingType: 'full_numbers',
 			buttons: [
@@ -74,6 +77,19 @@ var KTDatatablesBasicPaginations = function() {
 					width: '5%',
 					
 				},
+				{
+					targets: 5,
+					type: "datetime-moment",
+					"render": function (data, type, row, meta) {
+						var DateCreated = moment(data, 'DD-MM-YYYY HH:mm:ss').format('MM/DD/YYYY HH:mm:ss');
+						if(DateCreated == 'Invalid date'){
+							DateCreated = '-';
+						}
+						return DateCreated;
+					},
+				},
+
+				
 				
 				
 			],
@@ -141,11 +157,15 @@ function deleteRow(aId){
         	
         	document.location.href = 'rulefalcodelete?id='+aId;
         	
-            swal.fire(
-                'Deleted!',
-                'Your file has been deleted.',
-                'success'
-            )
+			swal({
+				title: 'Deleted!', 
+				text: 'Your data has been deleted.', 
+				type: "success"
+				},
+			function(){ 
+				location.reload();
+			});
+
         }
     });
 }
@@ -179,6 +199,8 @@ function addDialogScan(){
 				'Your image has been requested to be analize.',
 				'success'
 			)
+			
+			 setTimeout(function(){ location.reload();}, 1000);
 		}
 		})
 }

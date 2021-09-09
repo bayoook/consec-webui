@@ -31,6 +31,8 @@ function updateRow(enabledVar,actionIdVar,idVar,type){
 				'success'
 			)
 
+			location.reload();
+
 		});
 	}else{
 
@@ -41,9 +43,25 @@ function updateRow(enabledVar,actionIdVar,idVar,type){
 				'Your data has been updated.',
 				'success'
 			)
-
+			location.reload();
 		});
 	}
+}
+
+
+function updateRow2(enabledVar,rowName){
+	
+	var enabledInt = enabledVar.checked ? true:false;
+	handleAjax('/runtimealertupdate', 'POST', { enabled:enabledInt, name:rowName }, function(res) {
+		swal.fire(
+			'Success!',
+			'Your data has been updated.',
+			'success'
+		)
+		location.reload();
+
+	});
+
 }
 
 var KTDatatablesBasicPaginations = function() {
@@ -106,7 +124,7 @@ var KTDatatablesBasicPaginations = function() {
 					width: '5%',
 					render: function ( data, type, row ) {
 
-							
+							var x ;
 							const optionAction = JSON.parse('[(${action})]');
 							 data = data.replace(/<\/?span[^>]*>/g,"");
 							 var enableRow = row[3].replace(/<\/?span[^>]*>/g,"");
@@ -129,8 +147,14 @@ var KTDatatablesBasicPaginations = function() {
 
 							 });
 
+							 if(idRow !=5){
+								x = $select.prop("outerHTML")
+							 }else{
+								x = '-';
+							 }
 							
-                            return $select.prop("outerHTML");
+							
+                            return x;
 
 
 					}
@@ -154,12 +178,18 @@ var KTDatatablesBasicPaginations = function() {
 								}
 
 							});
-
-							if(enabledRow == 1){
-								return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  checked="'+enabledRow+'" onclick="updateRow(this,\''+idAction+'\','+idRow+')" /><span></span></label></span>';	
+							if(idRow != 5){
+								if(enabledRow == 1){
+									return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  checked="'+enabledRow+'" onclick="updateRow(this,\''+idAction+'\','+idRow+')" /><span></span></label></span>';	
+								}else{
+									return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  onclick="updateRow(this,\''+idAction+'\','+idRow+')" /><span></span></label></span>';	
+								}
 							}else{
-								return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  onclick="updateRow(this,\''+idAction+'\','+idRow+')" /><span></span></label></span>';	
-					
+								if(enabledRow == 1){
+									return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  checked="'+enabledRow+'" onclick="updateRow2(this,\'ImageScanNOTIFY\')" /><span></span></label></span>';	
+								}else{
+									return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  onclick="updateRow2(this,\'ImageScanNOTIFY\')" /><span></span></label></span>';	
+								}
 							}
 					}
 				},
@@ -252,8 +282,8 @@ jQuery(document).ready(function() {
 <section layout:fragment="layout_title">
 	<div class=" flex-wrap py-3" >
 		<div class="card-title">
-			 <h3 class="card-label">Image Alerting 
-			<span class="d-block text-muted pt-2 font-size-sm">Image Alerting list</span></h3> 
+			 <h3 class="card-label">Alerting 
+			<span class="d-block text-muted pt-2 font-size-sm">Alerting list</span></h3> 
 		</div>
 	</div>
 </section>
@@ -340,6 +370,20 @@ jQuery(document).ready(function() {
 					<!--end::Dropdown Menu-->
 				</div>
 				<!--end::Dropdown-->
+				<!--begin::Button-->
+				<a th:href="@{emailconfig?id=mailRecipient-CM.conf}" class="btn btn-primary font-weight-bolder">
+					<span class="svg-icon svg-icon-md">
+						<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
+						<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+							<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+								<rect x="0" y="0" width="24" height="24" />
+								<circle fill="#000000" cx="9" cy="15" r="6" />
+								<path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z" fill="#000000" opacity="0.3" />
+							</g>
+						</svg>
+						<!--end::Svg Icon-->
+					</span>Email Recipient</a>
+					<!--end::Button-->
 			</div>
 		</div>			
 		<div class="card-body">

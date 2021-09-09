@@ -14,9 +14,11 @@
 
 <th:block layout:fragment="js-extra">
 
-<script>
+<script >
       function reloadIframe(){
-            document.getElementById('frame_id_').contentWindow.location.reload();
+           // document.getElementById('frame_id_').contentWindow.location.reload();
+      //      location.reload();
+      window.location.reload();
       }
 </script>
 </th:block>
@@ -48,11 +50,11 @@
 
 
 <section layout:fragment="layout_action">
-       <a href="javascript:void(0);" class="btn btn-sm btn-primary" onclick="reloadIframe();" >Refresh</a> 
-</section>						kibanaUrl
+       <!-- <a href="javascript:void(0);" class="btn btn-sm btn-primary" onclick="reloadIframe();" >Refresh</a>  -->
+</section>						
 
 <section layout:fragment="layout_content">
-      <iframe id="frame_id_" style="height: 80vh;" th:src="${kibanaUrl}" frameborder="0" width="100%"></iframe>			
+      <iframe id="frame_id_" style="height: 80vh;" th:src="${kibanaUrl}" frameborder="0" width="100%" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>			
 </section>
 
 </html>

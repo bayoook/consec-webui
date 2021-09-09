@@ -42,6 +42,7 @@ public class ConfigFalcoController {
 
 	String PRETY_PREFIX = "<pre class='language-yaml'><code>";
 	String PRETY_SUFIX = "</code></pre>";
+    String PRETY_PREFIX_ = "<pre class=\"language-yaml\"><code>";
 	
 
     @GetMapping("configfalcoindex")
@@ -118,9 +119,10 @@ public class ConfigFalcoController {
         NonNamespaceOperation<ConfigMap, ConfigMapList, Resource<ConfigMap>>  cm =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev");
        Map<String,String> map = cm.withName("falco-duplicate").get().getData();
 
+       System.out.println("after replace "+paramFalco.getValue().replace(PRETY_PREFIX, "").replace(PRETY_SUFIX, "").replace(PRETY_PREFIX_, ""));
 
     
-       map.put(paramFalco.getName(), paramFalco.getValue().replace(PRETY_PREFIX, "").replace(PRETY_SUFIX, ""));
+       map.put(paramFalco.getName(), paramFalco.getValue().replace(PRETY_PREFIX, "").replace(PRETY_SUFIX, "").replace(PRETY_PREFIX_, ""));
    
        ConfigMap newConfigMap = new ConfigMapBuilder().withNewMetadata()
        .withName("falco-duplicate")

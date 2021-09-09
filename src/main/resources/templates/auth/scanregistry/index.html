@@ -14,8 +14,13 @@
 <th:block layout:fragment="js-extra">
 		<!--begin::Page Vendors(used by this page) -->
 		<script th:src="@{/assets/plugins/custom/datatables/datatables.bundle.js}" type="text/javascript"></script>
+		<script th:src="@{assets/plugins/custom/datatables/datetime-moment.js}"  type="text/javascript"></script>
+	
 		<!--end::Page Vendors -->
 <script>
+
+
+$.fn.dataTable.moment( 'DD-MM-YYYY HH:mm:ss' );
 
 
 
@@ -81,6 +86,28 @@ var KTDatatablesBasicPaginations = function() {
 					width: '10%',
 					orderable: false,
 					
+				},
+				{
+					targets: 7,
+					type: "datetime-moment",
+					"render": function (data, type, row, meta) {
+						var DateCreated = moment(data, 'DD-MM-YYYY HH:mm:ss').format('MM/DD/YYYY HH:mm:ss');
+						if(DateCreated == 'Invalid date'){
+							DateCreated = '-';
+						}
+						return DateCreated;
+					},
+				},
+				{
+					targets: 8,
+					type: "datetime-moment",
+					"render": function (data, type, row, meta) {
+						var DateCreated = moment(data, 'DD-MM-YYYY HH:mm:ss').format('MM/DD/YYYY HH:mm:ss');
+						if(DateCreated == 'Invalid date'){
+							DateCreated = '-';
+						}
+						return DateCreated;
+					},
 				},
 				
 				

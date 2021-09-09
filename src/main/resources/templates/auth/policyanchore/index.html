@@ -15,10 +15,13 @@
 <th:block layout:fragment="js-extra">
 		<!--begin::Page Vendors(used by this page) -->
 		<script th:src="@{/assets/plugins/custom/datatables/datatables.bundle.js}" type="text/javascript"></script>
+		<script th:src="@{assets/plugins/custom/datatables/datetime-moment.js}"  type="text/javascript"></script>
+	
 		<!--end::Page Vendors -->
 
 		<script th:inline="text">
 
+		$.fn.dataTable.moment( 'DD-MM-YYYY HH:mm:ss' );
 
 
 			function updateRow(enabledVar,policyIdVar){
@@ -31,6 +34,7 @@
 						'Your data has been updated.',
 						'success'
 					)
+					location.reload();
 		
 				});
 				
@@ -45,6 +49,7 @@ var KTDatatablesBasicPaginations = function() {
 
 		// begin first table
 		table.DataTable({
+			order: [7, 'desc' ],
 			responsive: true,
 			pagingType: 'full_numbers',
 			buttons: [
@@ -93,13 +98,13 @@ var KTDatatablesBasicPaginations = function() {
 					width: '50%',
 					
 				},
-				{
-					targets: -1,
-					title: 'Actions',
-					width: '10%',
-					orderable: false,
+				// {
+				// 	targets: -1,
+				// 	title: 'Actions',
+				// 	width: '10%',
+				// 	orderable: false,
 					
-				},
+				// },
 				
 				{
 					targets: 0,
@@ -115,7 +120,29 @@ var KTDatatablesBasicPaginations = function() {
 							}
 					}
 				},
-				
+
+				{
+					targets: 7,
+					type: "datetime-moment",
+					"render": function (data, type, row, meta) {
+						var DateCreated = moment(data, 'DD-MM-YYYY HH:mm:ss').format('MM/DD/YYYY HH:mm:ss');
+						if(DateCreated == 'Invalid date'){
+							DateCreated = '-';
+						}
+						return DateCreated;
+					},
+				},
+				{
+					targets: 6,
+					type: "datetime-moment",
+					"render": function (data, type, row, meta) {
+						var DateCreated = moment(data, 'DD-MM-YYYY HH:mm:ss').format('MM/DD/YYYY HH:mm:ss');
+						if(DateCreated == 'Invalid date'){
+							DateCreated = '-';
+						}
+						return DateCreated;
+					},
+				},
 				
 			],
 		});
@@ -291,9 +318,8 @@ function deleteRow(aId){
 				</div>
 				<!--end::Dropdown-->
 				<!--begin::Button-->
-				<a th:href="@{policyanchoreadd}" class="btn btn-primary font-weight-bolder">
+				<!-- <a th:href="@{policyanchoreadd}" class="btn btn-primary font-weight-bolder">
 				<span class="svg-icon svg-icon-md">
-					<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
 					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
 						<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
 							<rect x="0" y="0" width="24" height="24" />
@@ -301,8 +327,7 @@ function deleteRow(aId){
 							<path d="M8.8012943,7.00241953 C9.83837775,5.20768121 11.7781543,4 14,4 C17.3137085,4 20,6.6862915 20,10 C20,12.2218457 18.7923188,14.1616223 16.9975805,15.1987057 C16.9991904,15.1326658 17,15.0664274 17,15 C17,10.581722 13.418278,7 9,7 C8.93357256,7 8.86733422,7.00080962 8.8012943,7.00241953 Z" fill="#000000" opacity="0.3" />
 						</g>
 					</svg>
-					<!--end::Svg Icon-->
-				</span>New Record</a>
+				</span>New Record</a> -->
 				<!--end::Button-->
 			</div>
 		</div>			
@@ -320,7 +345,7 @@ function deleteRow(aId){
 						<th >User ID</th>
 						<th >Created At</th>
 						<th >Last Updated</th>
-						<th   class="dt-center">Actions</th>
+						<!-- <th   class="dt-center">Actions</th> -->
 					</tr>
 				</thead>
 				<tbody>
@@ -339,7 +364,7 @@ function deleteRow(aId){
 					
 						
 						
-						<td class="dt-center" >
+						<!-- <td class="dt-center" >
 						
 						<a th:href="@{|policyanchoreedit?id=${listObj.policyId}|}" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Edit">
 							<em class="la la-edit"></em>
@@ -349,7 +374,7 @@ function deleteRow(aId){
 							<i class="la la-minus-square"></i>
 						</a>
 						
-						</td>
+						</td> -->
 					</tr>
 				
 				</span>
