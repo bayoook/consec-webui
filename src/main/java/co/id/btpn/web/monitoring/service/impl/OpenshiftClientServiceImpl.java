@@ -27,8 +27,9 @@ public class OpenshiftClientServiceImpl implements OpenshiftClientService{
 	    private static final Logger logger = LoggerFactory.getLogger(OpenshiftClientServiceImpl.class);
 
         private KubernetesClient client =null;
-        @Value("${openshift.url}")
-        private String openshiftUrl;
+
+        // @Value("${openshift.url}")
+        // private String openshiftUrl;
         
         @Value("${kubernetes.keystore.file}")
         private String kubernetesKeystoreFile;
@@ -42,11 +43,20 @@ public class OpenshiftClientServiceImpl implements OpenshiftClientService{
         @Value("${kubernetes.truststore.passphrase}")
         private String kubernetesTruststorePassphrase;
 
-        @Value("${kubernetes.auth.basic.username}")
-        private String kubernetesAuthBasicUsername;
+        // @Value("${kubernetes.auth.basic.username}")
+        // private String kubernetesAuthBasicUsername;
 
-        @Value("${kubernetes.auth.basic.password}")
-        private String kubernetesAuthBasicPassword;
+        // @Value("${kubernetes.auth.basic.password}")
+        // private String kubernetesAuthBasicPassword;
+
+        @Value("${kubernetes.auth.tryServiceAccount}")
+        private String kubernetesAuthTryServiceAccount;
+
+        // @Value("${kubernetes.certs.client.file}")
+        // private String kubernetesCertsClientFile;
+
+        // @Value("${kubernetes.auth.token}")
+        // private String kubernetesAuthToken;
 
         @Value("${kubernetes.namespace}")
         private String kubernetesNamespace;
@@ -59,16 +69,9 @@ public class OpenshiftClientServiceImpl implements OpenshiftClientService{
         String trustStore = basedir + kubernetesTruststoreFile;
 		
         System.setProperty("kubernetes.trust.certificates", "true");
+        System.setProperty("kubernetes.auth.tryServiceAccount", "true");
 
-
-        if(client!=null){
-
-
-        }
         try (KubernetesClient client =  new DefaultKubernetesClient(new ConfigBuilder()
-            .withMasterUrl(openshiftUrl)
-            .withUsername(kubernetesAuthBasicUsername)
-            .withPassword(kubernetesAuthBasicPassword)
             .withKeyStoreFile(keyStore)
             .withKeyStorePassphrase(kubernetesKeystorePassphrase)
             .withTrustStoreFile(trustStore)

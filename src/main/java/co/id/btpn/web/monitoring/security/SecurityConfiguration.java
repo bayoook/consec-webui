@@ -2,6 +2,7 @@ package co.id.btpn.web.monitoring.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
+import org.springframework.security.ldap.userdetails.LdapUserDetails;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -30,9 +32,12 @@ import co.id.btpn.web.monitoring.model.Userapp;
 import co.id.btpn.web.monitoring.repository.UserappRepository;
 import co.id.btpn.web.monitoring.service.UserappService;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
+
+import org.springframework.core.env.Environment;
 
 /**
  *
@@ -48,20 +53,32 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     UserappRepository userappRepository;
+	
+	@Autowired
+	Environment env;
+
+	// @Autowired
+	// CustomLdapAuthoritiesPopulator customLdapAuthoritiesPopulator;
 
 	private static final Logger LOG = LoggerFactory.getLogger(SecurityConfiguration.class);
    
-	@Value("${ldap.urls}")
+	@Value("${spring.ldap.urls}")
     private String ldapUrls;
 
-    @Value("${ldap.base.dn}")
-    private String ldapBaseDn;
+    @Value("${spring.ldap.base}")
+    private String ldapBase;
 
-	@Value("${ldap.base.groupsearchbase}")
-    private String groupSearchBase;
- 
-    @Value("${ldap.user.dn.pattern}")
-    private String ldapUserDnPattern;
+    @Value("${spring.ldap.username}")
+    private String springLdapUsername;
+
+    @Value("${spring.ldap.password}")
+    private String springLdapPassword;
+
+	@Value("${ldap.base.dn.search}")
+    private String ldapBaseDnSearch;
+
+	@Value("${ldap.base.dn.search.filter}")
+    private String ldapBaseDnSearchFilter;
 	
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -76,24 +93,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .withUser("user").password(password).roles("USER");
 
 
-		LOG.info("Connecting to LDAP server {}{}", ldapUrls , ldapBaseDn);
-		LOG.info("LDAP User DN Pattern {} " , ldapUserDnPattern);
-		LOG.info("LDAP search base {} " , groupSearchBase);
+		LOG.info("Connecting to LDAP server {}", ldapUrls );
+		LOG.info("LDAP search base {} " , ldapBaseDnSearch);
+
 
 		auth
 		.ldapAuthentication()
 		.userDetailsContextMapper(userDetailsContextMapper())
-		//  .userDnPatterns("uid={0},ou=people")
-		  .userDnPatterns(ldapUserDnPattern)
-		//   .groupSearchBase(groupSearchBase)
+		.ldapAuthoritiesPopulator(getCustomLdapAuthoritiesPopulator())
+		.userSearchBase(ldapBaseDnSearch)
+        .userSearchFilter(ldapBaseDnSearchFilter)
 		  .contextSource()
-		//	.url("ldap://localhost:10389/dc=example,dc=com")
-			.url(ldapUrls + ldapBaseDn)
-			.and()
-		  .passwordCompare()
-			//.passwordEncoder(new BCryptPasswordEncoder())
-			.passwordEncoder( new LdapShaPasswordEncoder())
-			.passwordAttribute("userPassword");
+			.url(ldapUrls)
+			.managerDn(springLdapUsername)
+            .managerPassword(springLdapPassword);
 
 	
 	}
@@ -137,31 +150,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	       .antMatchers("/resources/**","/loginmf/**","/manifest/**","/assets/**","/error/**", "/static/**", "/css/**", "/js/**", "/plugins/**" ,"/media/**","/custom/**","/fonts/**");
 	}
 
-
-	// @Bean
-    // public UserDetailsContextMapper userDetailsContextMapper() {
-    //     return new LdapUserDetailsMapper() {
-    //         @Override
-    //         public UserDetails mapUserFromContext(DirContextOperation
-	// 		s ctx, String username, Collection<? extends GrantedAuthority> authorities) {
-
-	// 			List<GrantedAuthority>
-
-	// 			UserDetails details = userServiceImpl.loadUserByUsername(username);
-	// 			// UserDetails details= userappService.findByName(username);
-    //             return  details;
-    //         }
-    //     };
-    // }
-
 	@Bean
     public UserDetailsContextMapper userDetailsContextMapper() {
         return new LdapUserDetailsMapper() {
             @Override
             public UserDetails mapUserFromContext(DirContextOperations ctx, String username, Collection<? extends GrantedAuthority> authorities) {
 				List<GrantedAuthority> loadedAuthorities =  loadUserByUsername(username);
-                return super.mapUserFromContext(ctx, username, loadedAuthorities);
+				UserDetails details = super.mapUserFromContext(ctx, username, loadedAuthorities);
+                return new CustomLdapUserDetails((LdapUserDetails) details, env);
             }
+			
         };
     }
 
@@ -183,6 +181,21 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		
         return  authorities;
     }
+
+
+	@Bean
+    public CustomLdapAuthoritiesPopulator getCustomLdapAuthoritiesPopulator() {
+        return new CustomLdapAuthoritiesPopulator();
+    }
+
+	private class CustomLdapAuthoritiesPopulator implements LdapAuthoritiesPopulator {
+ 
+		@Override
+		public Collection<? extends GrantedAuthority> getGrantedAuthorities(DirContextOperations userData, String username) {
+			
+			return loadUserByUsername(username);
+		}
+	}
 
 }
 

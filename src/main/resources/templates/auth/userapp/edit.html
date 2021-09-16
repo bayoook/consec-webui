@@ -16,6 +16,43 @@
 
 <th:block layout:fragment="js-extra">
 
+	<script>
+	jQuery(document).ready(function($) {
+		$('#submitaction').prop("disabled", true);
+	});
+
+
+	function validateUser(){
+		
+		handleAjax('/uservalidation', 'POST', { name: $('#name').val() }, function(res) {
+			
+		$('#submitaction').prop("disabled", true);
+			
+			if(res == false){
+				swal.fire(
+					'Success!',
+					'User has been found.',
+					'success'
+				)
+				$('#submitaction').prop("disabled", false);
+			
+			}
+			if(res == true){
+				swal.fire(
+					'Failed!',
+					'User Not Found.',
+					'error'
+				)
+				$('#submitaction').prop("disabled", true);
+			
+			}
+		
+
+		});
+
+		</script>
+
+
 </th:block>
 
 
@@ -31,7 +68,6 @@
 
 
 <section layout:fragment="layout_content">
-		<!-- begin:: Content -->
 					
 		<div class="card-body">
 			<form  id="kt_form"  th:action="@{/userappedit}" th:object="${userapp}" method="post" >
@@ -47,11 +83,15 @@
 						<div class="col-xl-8">
 							<div class="kt-section kt-section--first">
 								<div class="kt-section__body">
-									<!-- <h3 class="kt-section__title kt-section__title-lg">User Info:</h3> -->
 									<div class="form-group row">
 										<label class="col-3 col-form-label">Name</label>
-										<div class="col-9">
+										<div class="col-8">
 											<input class="form-control" type="text" th:field="*{name}" th:value="${userapp.name}">
+										</div>
+										<div class="col-1">
+											<a  href="javascript:;" onclick="validateUser();" class="btn btn-primary font-weight-bolder mr-2">
+												<em class="flaticon-search"></em>
+											</a>
 										</div>
 									</div>
 									
@@ -91,7 +131,7 @@
 					</span>Back</a>
 				<!--end::Button-->
 				<!--begin::Button-->
-				<a href="javascript:;" onclick="document.getElementById('kt_form').submit();" class="btn btn-primary font-weight-bolder mr-2">
+				<button type="button" id="submitaction" onclick="document.getElementById('kt_form').submit();" class="btn btn-primary font-weight-bolder mr-2">
 				<span class="svg-icon svg-icon-md">
 					<!--begin::Svg Icon | path:assets/media/svg/icons/Design/Flatten.svg-->
 					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
@@ -102,7 +142,7 @@
 						</g>
 					</svg>
 					<!--end::Svg Icon-->
-				</span>Save</a>
+				</span>Save</button>
 				<!--end::Button-->
 			</div>
 		</div>

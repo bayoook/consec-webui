@@ -1,5 +1,6 @@
 package co.id.btpn.web.monitoring.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
 import co.id.btpn.web.monitoring.model.Role;
@@ -18,6 +20,7 @@ import co.id.btpn.web.monitoring.model.Userapp;
 import co.id.btpn.web.monitoring.service.RoleService;
 import co.id.btpn.web.monitoring.service.UserappService;
 
+import co.id.btpn.web.monitoring.service.LdapSearchService;
 
 
 /**
@@ -33,6 +36,10 @@ public class UserappController {
 
     @Autowired
 	RoleService roleService;
+
+
+    @Autowired
+    LdapSearchService ldapSearchService;
 	
 	
 
@@ -96,6 +103,24 @@ public class UserappController {
     	userappService.deactiveById(id);
     	
     	return "redirect:userappindex";
+    }
+
+    @PostMapping("uservalidation")
+    public  @ResponseBody Boolean userValidation( @RequestParam Map<String,String> allParams ) throws IOException {
+
+    	String name = "";
+
+
+    	if (allParams.containsKey("name")){
+    		name =  allParams.get("name");
+    	}
+
+
+
+        List<String> lp = ldapSearchService.getPersonNamesByAccountName(name+"*");
+
+
+    	return lp.isEmpty() ;
     }
         
     @ModelAttribute("attributes")

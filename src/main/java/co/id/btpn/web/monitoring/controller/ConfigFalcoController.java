@@ -52,7 +52,7 @@ public class ConfigFalcoController {
     	// model.addAttribute("list", list);
         
 
-       ConfigMap cm =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("falco-duplicate").get();
+       ConfigMap cm =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("falco").get();
        Map<String,String> map = cm.getData();
     
 
@@ -95,7 +95,7 @@ public class ConfigFalcoController {
     	// model.addAttribute("configFalco", configFalco);
 
 
-       ConfigMap cm =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("falco-duplicate").get();
+       ConfigMap cm =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("falco").get();
        Map<String,String> map = cm.getData();
 
        paramFalco.setName(id);
@@ -117,7 +117,7 @@ public class ConfigFalcoController {
 
 
         NonNamespaceOperation<ConfigMap, ConfigMapList, Resource<ConfigMap>>  cm =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev");
-       Map<String,String> map = cm.withName("falco-duplicate").get().getData();
+       Map<String,String> map = cm.withName("falco").get().getData();
 
        System.out.println("after replace "+paramFalco.getValue().replace(PRETY_PREFIX, "").replace(PRETY_SUFIX, "").replace(PRETY_PREFIX_, ""));
 
@@ -125,7 +125,7 @@ public class ConfigFalcoController {
        map.put(paramFalco.getName(), paramFalco.getValue().replace(PRETY_PREFIX, "").replace(PRETY_SUFIX, "").replace(PRETY_PREFIX_, ""));
    
        ConfigMap newConfigMap = new ConfigMapBuilder().withNewMetadata()
-       .withName("falco-duplicate")
+       .withName("falco")
        .withNamespace("consec-dev")
        .addToLabels("app", "falco")
        .endMetadata()

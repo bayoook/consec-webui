@@ -98,7 +98,7 @@ public class AlertingController {
 
 
 
-        ConfigMap cmcustom =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("mail-options-duplicate").get();
+        ConfigMap cmcustom =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("mail-options").get();
         Properties properties = new Properties();
         InputStream stream = new ByteArrayInputStream(cmcustom.getData().get("mail-options.incl").getBytes(StandardCharsets.UTF_8));
         properties.load(stream);
@@ -169,7 +169,7 @@ public class AlertingController {
     @GetMapping("runtimealertindex")
     public String runtimeIndex(CustomRuleFalco customRuleFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) throws IOException {
       
-       ConfigMap cmcustom =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("mail-options-duplicate").get();
+       ConfigMap cmcustom =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("mail-options").get();
        Properties properties = new Properties();
        InputStream stream = new ByteArrayInputStream(cmcustom.getData().get("mail-options.incl").getBytes(StandardCharsets.UTF_8));
        properties.load(stream);
@@ -219,7 +219,7 @@ public class AlertingController {
     	}
 
 
-        ConfigMap cmcustom =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("mail-options-duplicate").get();
+        ConfigMap cmcustom =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("mail-options").get();
         Properties properties = new Properties();
         InputStream stream = new ByteArrayInputStream(cmcustom.getData().get("mail-options.incl").getBytes(StandardCharsets.UTF_8));
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -235,7 +235,7 @@ public class AlertingController {
         configMapData.put("mail-options.incl", out);
 
         ConfigMap newConfigMap = new ConfigMapBuilder().withNewMetadata()
-            .withName("mail-options-duplicate")
+            .withName("mail-options")
             .withNamespace("consec-dev")
             .addToLabels("app", "falco")
             .endMetadata()
