@@ -47,6 +47,7 @@ public class UserappController {
     public String index(Userapp  userapp, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
       
     	List <Userapp> list= userappService.findAll();
+        
     	model.addAttribute("list", list);
         
     	return "auth/userapp/index";
@@ -56,6 +57,8 @@ public class UserappController {
     public String add(Userapp  userapp, Model model, @ModelAttribute("attributes") Map<?,?>  attributes) {
         
     	List <Role> list= roleService.findAll();
+        System.out.println("Role Count >>>> "+list.size());
+
     	model.addAttribute("roleList", list);
         
     	
@@ -77,6 +80,9 @@ public class UserappController {
         
 
     	List <Role> list= roleService.findAll();
+
+        System.out.println("Role Count >>>> "+list.size());
+
     	model.addAttribute("roleList", list);
     	
     	userapp = userappService.findById(id);
@@ -117,7 +123,7 @@ public class UserappController {
 
 
 
-        List<String> lp = ldapSearchService.getPersonNamesByAccountName(name+"*");
+        List<String> lp = ldapSearchService.getPersonNamesByAccountName(name);
 
 
     	return lp.isEmpty() ;

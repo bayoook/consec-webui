@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import co.id.btpn.web.monitoring.model.Role;
 import co.id.btpn.web.monitoring.model.UserLog;
 import co.id.btpn.web.monitoring.model.Userapp;
 import co.id.btpn.web.monitoring.repository.UserLogRepository;
@@ -30,6 +31,13 @@ public class UserappServiceImpl implements UserappService{
 	@Override
 	public void save(Userapp user) {
 		
+		List<Userapp>  userappList = userappRepository.findByName(user.getName());
+      
+		if(userappList.size()>0){
+			//user = userappList.get(0);
+			user.setId(userappList.get(0).getId()); 
+		}
+
         user.setActive(1);
 		user.setCreatedBy(util.getLoggedUserName());
 		user.setCreatedDate(new Date());
@@ -56,6 +64,14 @@ public class UserappServiceImpl implements UserappService{
 	
 	@Override
 	public void update(Userapp userapp) {
+
+		//CHECK IF THE NAME IS SAME 
+		List<Userapp>  userappList = userappRepository.findByName(userapp.getName());
+      
+		if(userappList.size()>0){
+			
+			userapp.setId(userappList.get(0).getId()); 
+		}
 
 		//updatePageSlugWithTitle(p1);
 		userapp.setModifiedBy(util.getLoggedUserName());

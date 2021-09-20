@@ -25,6 +25,9 @@ import org.springframework.web.client.RestTemplate;
 import co.id.btpn.web.monitoring.model.policy.anchore.Policies;
 
 
+import co.id.btpn.web.monitoring.model.UserLog;
+import co.id.btpn.web.monitoring.repository.UserLogRepository;
+import co.id.btpn.web.monitoring.util.Util;
 
 
 /**
@@ -48,6 +51,12 @@ public class PolicyAnchoreController {
     @Autowired
     private RestTemplate restTemplate;
 	
+
+	@Autowired
+	private UserLogRepository userLogRepository;
+
+	@Autowired
+	private Util util;
 
     @GetMapping("policyanchoreindex")
     public String index(Policies policies, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
@@ -207,6 +216,15 @@ public class PolicyAnchoreController {
         requestEntity = new HttpEntity(json,headers);
         responseEntity =  restTemplate.exchange(anchoreUrl+"/policies/"+id, HttpMethod.PUT, requestEntity, String.class);
     
+
+        UserLog userLog = new UserLog();
+        userLog.setActivity("Update Scanning Policy id = \""+ id +"\", enabled = \""+ enabled +"\" ");
+        userLog.setLogDate(new java.util.Date());
+        userLog.setName(util.getLoggedUserName());
+        userLogRepository.save(userLog);
+        
+
+
     	return responseEntity.getBody();
     }
         

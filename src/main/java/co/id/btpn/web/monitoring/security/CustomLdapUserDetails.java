@@ -13,11 +13,30 @@ public class CustomLdapUserDetails implements LdapUserDetails {
     
     private LdapUserDetails details;
     private Environment env;
+    private String thumbnailPhoto;
+    private String mail;
 
     public CustomLdapUserDetails(LdapUserDetails details, Environment env) {
         this.details = details;
         this.env = env;
     }
+
+    public String getMail() {
+        return this.mail;
+    }
+
+    public String getThumbnailPhoto() {
+        return this.thumbnailPhoto; 
+    }
+
+    public void setMail(String mail) {
+        this.mail=mail;
+    }
+
+    public void setThumbnailPhoto(String thumbnailPhoto) {
+        this.thumbnailPhoto = thumbnailPhoto;
+    }
+
     
     public boolean isEnabled() {
         return details.isEnabled() && getUsername().equals(env.getRequiredProperty("ldap.username"));

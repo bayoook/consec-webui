@@ -24,6 +24,11 @@ import org.springframework.web.client.RestTemplate;
 import co.id.btpn.web.monitoring.model.image.Registry;
 
 
+import co.id.btpn.web.monitoring.model.UserLog;
+import co.id.btpn.web.monitoring.repository.UserLogRepository;
+import co.id.btpn.web.monitoring.util.Util;
+
+
 
 /**
  *
@@ -47,6 +52,13 @@ public class RegistryController {
     @Autowired
     private RestTemplate restTemplate;
 	
+
+
+	@Autowired
+	private UserLogRepository userLogRepository;
+
+	@Autowired
+	private Util util;
 
     
    
@@ -95,6 +107,15 @@ public class RegistryController {
         HttpEntity requestEntity = new HttpEntity(json,headers);
         ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/registries", HttpMethod.POST, requestEntity, String.class);
               
+
+
+        UserLog userLog = new UserLog();
+        userLog.setActivity("Add Registry = \""+ registry.getRegistryName() +"\"  ");
+        userLog.setLogDate(new java.util.Date());
+        userLog.setName(util.getLoggedUserName());
+        userLogRepository.save(userLog);
+        
+
     	return "redirect:scanregistryindex";
     }
 
@@ -117,6 +138,8 @@ public class RegistryController {
 
         model.addAttribute("registry", imageList[0]); 
 
+
+      
     	
     	return "auth/scanregistry/edit";
     }
@@ -136,7 +159,14 @@ public class RegistryController {
 
         HttpEntity requestEntity = new HttpEntity(json,headers);
         ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/registries/"+registry.getRegistry(), HttpMethod.PUT, requestEntity, String.class);
-              
+           
+        UserLog userLog = new UserLog();
+        userLog.setActivity("Edit Registry = \""+ registry.getRegistryName() +"\"  ");
+        userLog.setLogDate(new java.util.Date());
+        userLog.setName(util.getLoggedUserName());
+        userLogRepository.save(userLog);
+        
+
     	return "redirect:scanregistryindex";
     }
 
@@ -159,6 +189,12 @@ public class RegistryController {
         HttpEntity requestEntity = new HttpEntity(json,headers);
         ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/registries/"+registry.getRegistry(), HttpMethod.DELETE, requestEntity, String.class);
               
+        UserLog userLog = new UserLog();
+        userLog.setActivity("Delete Registry = \""+ registry.getRegistryName() +"\"  ");
+        userLog.setLogDate(new java.util.Date());
+        userLog.setName(util.getLoggedUserName());
+        userLogRepository.save(userLog);
+        
     	
     	
     	return "redirect:scanregistryindex";

@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import co.id.btpn.web.monitoring.model.ConfigFalco;
 import co.id.btpn.web.monitoring.model.policy.anchore.Param;
-import co.id.btpn.web.monitoring.service.ConfigFalcoService;
 import co.id.btpn.web.monitoring.service.OpenshiftClientService;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
@@ -24,6 +22,9 @@ import io.fabric8.kubernetes.api.model.ConfigMapList;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 
+import co.id.btpn.web.monitoring.model.UserLog;
+import co.id.btpn.web.monitoring.repository.UserLogRepository;
+import co.id.btpn.web.monitoring.util.Util;
 
 
 /**
@@ -34,11 +35,16 @@ import io.fabric8.kubernetes.client.dsl.Resource;
 @SessionAttributes("attributes")
 public class ConfigFalcoController {
 
-	@Autowired
-	ConfigFalcoService configFalcoService;
 
     @Autowired
     OpenshiftClientService openshiftClientService;
+
+
+	@Autowired
+	private UserLogRepository userLogRepository;
+
+	@Autowired
+	private Util util;
 
 	String PRETY_PREFIX = "<pre class='language-yaml'><code>";
 	String PRETY_SUFIX = "</code></pre>";
@@ -46,7 +52,7 @@ public class ConfigFalcoController {
 	
 
     @GetMapping("configfalcoindex")
-    public String index(ConfigFalco  configFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
+    public String index( Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
       
     	// List <ConfigFalco> list= configFalcoService.findAll();
     	// model.addAttribute("list", list);
@@ -70,22 +76,6 @@ public class ConfigFalcoController {
     	return "auth/configfalco/index";
     }
     
-    @GetMapping("configfalcoadd")
-    public String add(ConfigFalco  configFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
-        
-    	
-    	return "auth/configfalco/add";
-    }
-
-
-    @PostMapping("configfalcoadd")
-    public String addPost(ConfigFalco  configFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
-        
-    	configFalcoService.save(configFalco);;
-    	
-    	return "redirect:configfalcoindex";
-    }
-    
     
     @GetMapping("configfalcoedit")
     public String edit(Param  paramFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes , @RequestParam String id) {
@@ -104,7 +94,7 @@ public class ConfigFalcoController {
 
         model.addAttribute("configFalco", paramFalco);
         
-    	
+      
     	return "auth/configfalco/edit";
     }
 
@@ -135,17 +125,16 @@ public class ConfigFalcoController {
        
        cm.createOrReplace(newConfigMap);
 
+       UserLog userLog = new UserLog();
+       userLog.setActivity("Update Config Falco File Name = \""+ paramFalco.getName() +"\"  ");
+       userLog.setLogDate(new java.util.Date());
+       userLog.setName(util.getLoggedUserName());
+       userLogRepository.save(userLog);
+       
+
     	return "redirect:configfalcoindex";
     }
     
-    
-    @GetMapping("configfalcodelete")
-    public String delete(ConfigFalco  configFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes , @RequestParam Long id) {
-          	
-    	configFalcoService.deleteById(id);
-    	
-    	return "redirect:configfalcoindex";
-    }
         
     @ModelAttribute("attributes")
     public Map<?,?> attributes() {

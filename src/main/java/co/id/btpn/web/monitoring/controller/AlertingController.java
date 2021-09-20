@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,16 +37,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.client.RestTemplate;
 
-import co.id.btpn.web.monitoring.model.CustomRuleActionFalco;
-import co.id.btpn.web.monitoring.model.CustomRuleFalco;
 import co.id.btpn.web.monitoring.model.policy.anchore.Param;
 import co.id.btpn.web.monitoring.service.OpenshiftClientService;
+import co.id.btpn.web.monitoring.util.Util;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.fabric8.kubernetes.api.model.ConfigMapList;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
-
+import co.id.btpn.web.monitoring.model.CustomRuleFalco;
+import co.id.btpn.web.monitoring.model.UserLog;
+import co.id.btpn.web.monitoring.repository.UserLogRepository;
 
 
 /**
@@ -72,6 +74,11 @@ public class AlertingController {
     @Autowired
     OpenshiftClientService openshiftClientService;
 
+	@Autowired
+	private UserLogRepository userLogRepository;
+
+	@Autowired
+	private Util util;
 
 	String PRETY_PREFIX = "<pre class='language-yaml'><code>";
 	String PRETY_SUFIX = "</code></pre>";
@@ -162,6 +169,13 @@ public class AlertingController {
 
         ResponseEntity<String> responseEntity =  restTemplate.exchange(falcoUrl+"/rule/action/"+id, HttpMethod.PUT, requestEntity, String.class);
       
+
+		UserLog userLog = new UserLog();
+		userLog.setActivity("Update Alert ID = \""+ id +"\", actionId =  \""+ actionId +"\", enabled =  \""+ enabled +"\"  ");
+		userLog.setLogDate(new Date());
+		userLog.setName(util.getLoggedUserName());
+		userLogRepository.save(userLog);
+
     	return responseEntity.getBody();
     }
 
@@ -244,6 +258,12 @@ public class AlertingController {
     
         openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").createOrReplace(newConfigMap);
 
+        UserLog userLog = new UserLog();
+		userLog.setActivity("Update Runtime Alert = "+ enabled);
+		userLog.setLogDate(new Date());
+		userLog.setName(util.getLoggedUserName());
+		userLogRepository.save(userLog);
+
     	return "OK";
     }
 
@@ -303,6 +323,12 @@ public class AlertingController {
 
        
        cm.createOrReplace(newConfigMap);
+
+        UserLog userLog = new UserLog();
+		userLog.setActivity("Update Mail Recipient Config = "+ paramFalco.getValue().replace(PRETY_PREFIX, "").replace(PRETY_SUFIX, "").replace(PRETY_PREFIX_, ""));
+		userLog.setLogDate(new Date());
+		userLog.setName(util.getLoggedUserName());
+		userLogRepository.save(userLog);
 
     	return "redirect:imagealertindex";
     }

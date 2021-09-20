@@ -30,11 +30,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.client.RestTemplate;
 
-import co.id.btpn.web.monitoring.model.CustomRuleActionFalco;
-import co.id.btpn.web.monitoring.model.CustomRuleFalco;
 import co.id.btpn.web.monitoring.model.image.Annotations;
 import co.id.btpn.web.monitoring.model.image.Image;
 import co.id.btpn.web.monitoring.model.image.ImagePostScan;
+
+
+import co.id.btpn.web.monitoring.model.UserLog;
+import co.id.btpn.web.monitoring.repository.UserLogRepository;
+import co.id.btpn.web.monitoring.util.Util;
 
 
 
@@ -60,6 +63,14 @@ public class ScanOnDemandController {
     @Autowired
     private RestTemplate restTemplate;
 	
+
+
+	@Autowired
+	private UserLogRepository userLogRepository;
+
+	@Autowired
+	private Util util;
+
 
     
     @GetMapping("scanondemandindex") public String scanOnDemand(Model model, @ModelAttribute("attributes") Map<?,?> attributes) { 
@@ -107,6 +118,16 @@ public class ScanOnDemandController {
 
         ResponseEntity<String> responseEntity =  restTemplate.exchange(anchoreUrl+"/images", HttpMethod.POST, requestEntity, String.class);
       
+
+     
+        UserLog userLog = new UserLog();
+        userLog.setActivity("Add New Scan Request = \""+ tag +"\"  ");
+        userLog.setLogDate(new java.util.Date());
+        userLog.setName(util.getLoggedUserName());
+        userLogRepository.save(userLog);
+        
+    	
+
     	return responseEntity.getBody();
     }
 

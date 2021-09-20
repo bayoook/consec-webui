@@ -3,7 +3,7 @@ ARG JAR_FILE=target/*.jar
 ARG KEYSTORE_SSL_FILE=target/classes/cert/keystore.p12
 ARG KEYSTORE_FILE=target/classes/cert/keystore.jks
 ARG TRUSTSTORE_FILE=target/classes/cert/truststore.jks
-EXPOSE 443
+EXPOSE 8080
 COPY ${JAR_FILE} /usr/app/monitoring.jar
 COPY ${KEYSTORE_SSL_FILE} /home/jboss/keystore.p12
 COPY ${KEYSTORE_FILE} /usr/app/keystore.jks

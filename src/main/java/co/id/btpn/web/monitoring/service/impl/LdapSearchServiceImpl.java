@@ -77,9 +77,13 @@ public class LdapSearchServiceImpl implements LdapSearchService{
                 LdapQuery query = query()
                         .searchScope(SearchScope.SUBTREE)
                         .timeLimit(THREE_SECONDS)
-                        .countLimit(10)
                         .base(LdapUtils.emptyLdapName())
-                        .where(""+ldapBaseDnSearchFilter2).like(search);
+                        .countLimit(10)
+                        .where("objectClass").is("person")
+                        .and("objectClass").is("organizationalPerson")
+                        .and("uid").like(search)
+                //      .and("sAMAccountName").like(search)
+                        ;
         
                 return ldapTemplate.search(query, new MultipleAttributesMapper());
            

@@ -45,7 +45,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.fabric8.kubernetes.api.model.Pod;
@@ -54,7 +53,6 @@ import co.id.btpn.web.monitoring.model.PodExt;
 import co.id.btpn.web.monitoring.model.image.Image;
 import co.id.btpn.web.monitoring.security.CustomLdapUserDetails;
 import co.id.btpn.web.monitoring.service.OpenshiftClientService;
-
 
 /**
  *
@@ -70,58 +68,81 @@ public class RootController {
     @Autowired
     OpenshiftClientService openshiftClientService;
 
-	
-	@GetMapping("/") public String root() { return "login"; }
-    @GetMapping("/login") public String login() { return "login"; }
+    @GetMapping("/")
+    public String root() {
+        return "login";
+    }
+
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
+
+    @GetMapping("/access-denied")
+    public String denied() {
+        return "access-denied";
+    }
+
+    
+
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
-    @GetMapping("/dashboard") public String dashboard( HttpServletRequest request,Model model, @ModelAttribute("attributes") Map<?,?> attributes) throws JsonProcessingException, InvalidNameException {
+    @GetMapping("/dashboard")
+    public String dashboard(HttpServletRequest request, Model model, @ModelAttribute("attributes") Map<?, ?> attributes)
+            throws JsonProcessingException, InvalidNameException {
 
-      HttpSession session = request.getSession();
+        HttpSession session = request.getSession();
 
-      Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-      String dn = "";
-      if (principal instanceof CustomLdapUserDetails) {
-            dn = ((CustomLdapUserDetails)principal).getDn();
-      } 
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String dn = "";
+        if (principal instanceof CustomLdapUserDetails) {
+            dn = ((CustomLdapUserDetails) principal).getDn();
+        }
 
-     LdapName dnObj = new LdapName(dn);
+        LdapName dnObj = new LdapName(dn);
 
-     Boolean found =  false;
-      for(Rdn rdn : dnObj.getRdns()) {
-          if(rdn.getType().equalsIgnoreCase("CN")) {
-              session.setAttribute("userName", rdn.getValue());
-              found = true;
-              break;
-          }
-      }
-      if(Boolean.FALSE.equals(found)){
-        session.setAttribute("userName", ((CustomLdapUserDetails)principal).getUsername());
-      }
+        Boolean found = false;
+        for (Rdn rdn : dnObj.getRdns()) {
+            if (rdn.getType().equalsIgnoreCase("CN")) {
+                session.setAttribute("userName", rdn.getValue());
+                found = true;
+                break;
+            }
+        }
+        if (Boolean.FALSE.equals(found)) {
+            if (principal instanceof org.springframework.security.core.userdetails.User) {
+                session.setAttribute("userName",
+                        ((org.springframework.security.core.userdetails.User) principal).getUsername());
+            } else if (principal instanceof CustomLdapUserDetails) {
+                session.setAttribute("userName", ((CustomLdapUserDetails) principal).getUsername());
+            }
+        }
 
-      
+        if (principal instanceof CustomLdapUserDetails) {
+            session.setAttribute("userMail", ((CustomLdapUserDetails) principal).getMail());
+            session.setAttribute("userThumbnailPhoto", ((CustomLdapUserDetails) principal).getThumbnailPhoto());
+        }
         model.addAttribute("kibanaUrl", kibanaUrl);
-        return "auth/dashboard"; 
+        return "auth/dashboard";
     }
 
-    @GetMapping("servicestatusindex") public String serviceStatus( Model model, @ModelAttribute("attributes") Map<?,?> attributes ) throws JsonIOException, IOException { 
+    @GetMapping("servicestatusindex")
+    public String serviceStatus(Model model, @ModelAttribute("attributes") Map<?, ?> attributes)
+            throws JsonIOException, IOException {
 
-        List<PodExt> pods =  new ArrayList<>();
+        List<PodExt> pods = new ArrayList<>();
 
-       for (Pod iterable_element : openshiftClientService.getConnection().pods().list().getItems()) {
-           PodExt podExt = new PodExt(iterable_element);
-           pods.add(podExt);
-       }
+        for (Pod iterable_element : openshiftClientService.getConnection().pods().list().getItems()) {
+            PodExt podExt = new PodExt(iterable_element);
+            pods.add(podExt);
+        }
 
-       model.addAttribute("list", pods); 
-       return "auth/servicestatus/index"; 
+        model.addAttribute("list", pods);
+        return "auth/servicestatus/index";
     }
-    
+
     @ModelAttribute("attributes")
-    public Map<String,String> attributes() {
-        return new HashMap<String,String>();
+    public Map<String, String> attributes() {
+        return new HashMap<String, String>();
     }
-
-    
-
 
 }
