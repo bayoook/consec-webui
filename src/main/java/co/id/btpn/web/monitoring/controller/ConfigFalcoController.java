@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +40,11 @@ public class ConfigFalcoController {
     @Autowired
     OpenshiftClientService openshiftClientService;
 
+    @Value("${falco.config.namespace}")
+    private String fNameSpace;
+
+    @Value("${kubernetes.namespace}")
+    private String kNameSpace;
 
 	@Autowired
 	private UserLogRepository userLogRepository;
@@ -58,7 +64,7 @@ public class ConfigFalcoController {
     	// model.addAttribute("list", list);
         
 
-       ConfigMap cm =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("falco").get();
+       ConfigMap cm =  openshiftClientService.getConnection().configMaps().inNamespace(fNameSpace).withName("falco").get();
        Map<String,String> map = cm.getData();
     
 
@@ -85,7 +91,7 @@ public class ConfigFalcoController {
     	// model.addAttribute("configFalco", configFalco);
 
 
-       ConfigMap cm =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("falco").get();
+       ConfigMap cm =  openshiftClientService.getConnection().configMaps().inNamespace(fNameSpace).withName("falco").get();
        Map<String,String> map = cm.getData();
 
        paramFalco.setName(id);
@@ -106,7 +112,7 @@ public class ConfigFalcoController {
     	//configFalcoService.update(configFalco);
 
 
-        NonNamespaceOperation<ConfigMap, ConfigMapList, Resource<ConfigMap>>  cm =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev");
+        NonNamespaceOperation<ConfigMap, ConfigMapList, Resource<ConfigMap>>  cm =  openshiftClientService.getConnection().configMaps().inNamespace(fNameSpace);
        Map<String,String> map = cm.withName("falco").get().getData();
 
        System.out.println("after replace "+paramFalco.getValue().replace(PRETY_PREFIX, "").replace(PRETY_SUFIX, "").replace(PRETY_PREFIX_, ""));
@@ -116,7 +122,7 @@ public class ConfigFalcoController {
    
        ConfigMap newConfigMap = new ConfigMapBuilder().withNewMetadata()
        .withName("falco")
-       .withNamespace("consec-dev")
+       .withNamespace(fNameSpace)
        .addToLabels("app", "falco")
        .endMetadata()
        .addToData(map)

@@ -1,5 +1,6 @@
 package co.id.btpn.web.monitoring.controller;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,9 +94,13 @@ public class ScanOnDemandController {
     }
 
     @PostMapping("scanondemandadd")
-    public  @ResponseBody String updateCustomRule( @RequestParam Map<String,String> allParams ) {
+    public  @ResponseBody String updateCustomRule( @RequestParam Map<String,String> allParams ) throws IOException  {
 
     	String tag = "";
+
+        if(!util.isUserLoggedIn()){
+            return "SESSION_EXPIRED";
+        }
 
     	Annotations annotations = new Annotations();
         annotations.setOrigins("webui");

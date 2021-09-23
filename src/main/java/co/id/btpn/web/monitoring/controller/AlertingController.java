@@ -68,6 +68,12 @@ public class AlertingController {
     @Value("${falco.password}")
     private String falcoPassword;
 
+    @Value("${falco.config.namespace}")
+    private String fNameSpace;
+
+    @Value("${kubernetes.namespace}")
+    private String kNameSpace;
+
     @Autowired
     private RestTemplate restTemplate;
 
@@ -105,7 +111,7 @@ public class AlertingController {
 
 
 
-        ConfigMap cmcustom =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("mail-options").get();
+        ConfigMap cmcustom =  openshiftClientService.getConnection().configMaps().inNamespace(kNameSpace).withName("mail-options").get();
         Properties properties = new Properties();
         InputStream stream = new ByteArrayInputStream(cmcustom.getData().get("mail-options.incl").getBytes(StandardCharsets.UTF_8));
         properties.load(stream);
@@ -137,7 +143,7 @@ public class AlertingController {
 
 
     @PostMapping("imagealertupdate")
-    public  @ResponseBody String updateCustomRule( @RequestParam Map<String,String> allParams ) {
+    public  @ResponseBody String updateCustomRule( @RequestParam Map<String,String> allParams ) throws IOException {
 
     	String enabled = "";
     	String actionId = "";
@@ -155,6 +161,9 @@ public class AlertingController {
     		enabled =  allParams.get("enabled");
     	}
 
+        if(!util.isUserLoggedIn()){
+            return "SESSION_EXPIRED";
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -183,7 +192,7 @@ public class AlertingController {
     @GetMapping("runtimealertindex")
     public String runtimeIndex(CustomRuleFalco customRuleFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) throws IOException {
       
-       ConfigMap cmcustom =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("mail-options").get();
+       ConfigMap cmcustom =  openshiftClientService.getConnection().configMaps().inNamespace(kNameSpace).withName("mail-options").get();
        Properties properties = new Properties();
        InputStream stream = new ByteArrayInputStream(cmcustom.getData().get("mail-options.incl").getBytes(StandardCharsets.UTF_8));
        properties.load(stream);
@@ -232,8 +241,13 @@ public class AlertingController {
     		enabled =  allParams.get("enabled");
     	}
 
+        
+        if(!util.isUserLoggedIn()){
+            return "SESSION_EXPIRED";
+        }
 
-        ConfigMap cmcustom =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("mail-options").get();
+
+        ConfigMap cmcustom =  openshiftClientService.getConnection().configMaps().inNamespace(kNameSpace).withName("mail-options").get();
         Properties properties = new Properties();
         InputStream stream = new ByteArrayInputStream(cmcustom.getData().get("mail-options.incl").getBytes(StandardCharsets.UTF_8));
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -250,13 +264,13 @@ public class AlertingController {
 
         ConfigMap newConfigMap = new ConfigMapBuilder().withNewMetadata()
             .withName("mail-options")
-            .withNamespace("consec-dev")
+            .withNamespace(kNameSpace)
             .addToLabels("app", "falco")
             .endMetadata()
             .addToData(configMapData)
             .build();
     
-        openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").createOrReplace(newConfigMap);
+        openshiftClientService.getConnection().configMaps().inNamespace(kNameSpace).createOrReplace(newConfigMap);
 
         UserLog userLog = new UserLog();
 		userLog.setActivity("Update Runtime Alert = "+ enabled);
@@ -289,7 +303,7 @@ public class AlertingController {
     public String edit(Param  paramFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes , @RequestParam String id) {
     	
 
-       ConfigMap cm =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev").withName("mail-recipient-list").get();
+       ConfigMap cm =  openshiftClientService.getConnection().configMaps().inNamespace(kNameSpace).withName("mail-recipient-list").get();
        Map<String,String> map = cm.getData();
 
        paramFalco.setName(id);
@@ -307,7 +321,7 @@ public class AlertingController {
     public String editPost(Param  paramFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
         
        
-        NonNamespaceOperation<ConfigMap, ConfigMapList, Resource<ConfigMap>>  cm =  openshiftClientService.getConnection().configMaps().inNamespace("consec-dev");
+        NonNamespaceOperation<ConfigMap, ConfigMapList, Resource<ConfigMap>>  cm =  openshiftClientService.getConnection().configMaps().inNamespace(kNameSpace);
        Map<String,String> map = cm.withName("mail-recipient-list").get().getData();
 
 
@@ -316,7 +330,7 @@ public class AlertingController {
    
        ConfigMap newConfigMap = new ConfigMapBuilder().withNewMetadata()
        .withName("mail-recipient-list")
-       .withNamespace("consec-dev")
+       .withNamespace(kNameSpace)
        .endMetadata()
        .addToData(map)
        .build();

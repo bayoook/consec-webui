@@ -19,7 +19,7 @@ import co.id.btpn.web.monitoring.model.Role;
 import co.id.btpn.web.monitoring.model.Userapp;
 import co.id.btpn.web.monitoring.service.RoleService;
 import co.id.btpn.web.monitoring.service.UserappService;
-
+import co.id.btpn.web.monitoring.util.Util;
 import co.id.btpn.web.monitoring.service.LdapSearchService;
 
 
@@ -41,6 +41,8 @@ public class UserappController {
     @Autowired
     LdapSearchService ldapSearchService;
 	
+    @Autowired
+	private Util util;
 	
 
     @GetMapping("userappindex")
@@ -116,6 +118,10 @@ public class UserappController {
 
     	String name = "";
 
+        if(!util.isUserLoggedIn()){
+            return false;
+        }
+        
 
     	if (allParams.containsKey("name")){
     		name =  allParams.get("name");

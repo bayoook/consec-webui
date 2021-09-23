@@ -1,5 +1,6 @@
 package co.id.btpn.web.monitoring.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -178,7 +179,7 @@ public class PolicyAnchoreController {
 
 
     @PostMapping("policyanchoreupdate")
-    public  @ResponseBody String updateActive( @RequestParam Map<String,String> allParams ) {
+    public  @ResponseBody String updateActive( @RequestParam Map<String,String> allParams ) throws IOException  {
 
     	Boolean enabled = false;
     	String id = "";
@@ -192,6 +193,10 @@ public class PolicyAnchoreController {
     		enabled =  Boolean.parseBoolean(allParams.get("enabled"));
     	}
         
+
+        if(!util.isUserLoggedIn()){
+            return "SESSION_EXPIRED";
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -218,7 +223,7 @@ public class PolicyAnchoreController {
     
 
         UserLog userLog = new UserLog();
-        userLog.setActivity("Update Scanning Policy id = \""+ id +"\", enabled = \""+ enabled +"\" ");
+        userLog.setActivity("Update Scanning Policy = \""+ temp.getName() +"\", enabled = \""+ (enabled ? "Enable" : "Disabled") +"\" ");
         userLog.setLogDate(new java.util.Date());
         userLog.setName(util.getLoggedUserName());
         userLogRepository.save(userLog);

@@ -29,6 +29,7 @@
 			
 				var enabledInt = enabledVar.checked ? true:false;
 				handleAjax('/policyanchoreupdate', 'POST', { enabled:enabledInt, id:policyIdVar  }, function(res) {
+					
 					swal.fire(
 						'Success!',
 						'Your data has been updated.',
