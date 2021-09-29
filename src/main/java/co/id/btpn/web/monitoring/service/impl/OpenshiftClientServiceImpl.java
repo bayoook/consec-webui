@@ -28,8 +28,6 @@ public class OpenshiftClientServiceImpl implements OpenshiftClientService{
 
         private KubernetesClient client =null;
 
-        // @Value("${openshift.url}")
-        // private String openshiftUrl;
         
         @Value("${kubernetes.keystore.file}")
         private String kubernetesKeystoreFile;
@@ -43,11 +41,18 @@ public class OpenshiftClientServiceImpl implements OpenshiftClientService{
         @Value("${kubernetes.truststore.passphrase}")
         private String kubernetesTruststorePassphrase;
 
-        // @Value("${kubernetes.auth.basic.username}")
-        // private String kubernetesAuthBasicUsername;
 
-        // @Value("${kubernetes.auth.basic.password}")
-        // private String kubernetesAuthBasicPassword;
+        @Value("${kubernetes.force.basicAuth}")
+        private boolean kubernetesForceBasicAuth;
+
+        @Value("${openshift.url}")
+        private String openshiftUrl;
+
+        @Value("${kubernetes.auth.basic.username}")
+        private String kubernetesAuthBasicUsername;
+
+        @Value("${kubernetes.auth.basic.password}")
+        private String kubernetesAuthBasicPassword;
 
         @Value("${kubernetes.auth.tryServiceAccount}")
         private String kubernetesAuthTryServiceAccount;
@@ -69,28 +74,47 @@ public class OpenshiftClientServiceImpl implements OpenshiftClientService{
         String trustStore = basedir + kubernetesTruststoreFile;
 		
         System.setProperty("kubernetes.trust.certificates", "true");
-        System.setProperty("kubernetes.auth.tryServiceAccount", "true");
+            if(!kubernetesForceBasicAuth){
+                System.setProperty("kubernetes.auth.tryServiceAccount", "true");
+                try (KubernetesClient client =  new DefaultKubernetesClient(new ConfigBuilder()
+                    .withKeyStoreFile(keyStore)
+                    .withKeyStorePassphrase(kubernetesKeystorePassphrase)
+                    .withTrustStoreFile(trustStore)
+                    .withTrustStorePassphrase(kubernetesTruststorePassphrase)
+                    .withNamespace(kubernetesNamespace)
+                    .build())) {
 
-        try (KubernetesClient client =  new DefaultKubernetesClient(new ConfigBuilder()
-            .withKeyStoreFile(keyStore)
-            .withKeyStorePassphrase(kubernetesKeystorePassphrase)
-            .withTrustStoreFile(trustStore)
-            .withTrustStorePassphrase(kubernetesTruststorePassphrase)
-            .withNamespace(kubernetesNamespace)
-            .build())) {
-
-                if (Boolean.FALSE.equals(client.isAdaptable(OpenShiftClient.class))) {
-                    logger.warn("Target cluster is not OpenShift compatible");
-                    return null;
-                }else{
-                    OpenShiftClient oClient = client.adapt(OpenShiftClient.class);
-                    logger.info("Login Successful to : {} ",oClient.getMasterUrl());
-                    return oClient;
+                    if (Boolean.FALSE.equals(client.isAdaptable(OpenShiftClient.class))) {
+                        logger.warn("Target cluster is not OpenShift compatible");
+                        return null;
+                    }else{
+                        OpenShiftClient oClient = client.adapt(OpenShiftClient.class);
+                        logger.info("Login Successful to : {} ",oClient.getMasterUrl());
+                        return oClient;
+                    } 
                 }
+            }else{
+                try (KubernetesClient client =  new DefaultKubernetesClient(new ConfigBuilder()
+                    .withMasterUrl(openshiftUrl)
+                    .withUsername(kubernetesAuthBasicUsername)
+                    .withPassword(kubernetesAuthBasicPassword)
+                    .withKeyStoreFile(keyStore)
+                    .withKeyStorePassphrase(kubernetesKeystorePassphrase)
+                    .withTrustStoreFile(trustStore)
+                    .withTrustStorePassphrase(kubernetesTruststorePassphrase)
+                    .withNamespace(kubernetesNamespace)
+                    .build())) {
 
-		   
-		   
-		  }
+                    if (Boolean.FALSE.equals(client.isAdaptable(OpenShiftClient.class))) {
+                        logger.warn("Target cluster is not OpenShift compatible");
+                        return null;
+                    }else{
+                        OpenShiftClient oClient = client.adapt(OpenShiftClient.class);
+                        logger.info("Login Successful to : {} ",oClient.getMasterUrl());
+                        return oClient;
+                    } 
+                }
+            }
         }
     
 }

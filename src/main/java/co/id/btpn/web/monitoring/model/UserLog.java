@@ -1,6 +1,9 @@
 package co.id.btpn.web.monitoring.model;
 
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -8,8 +11,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,6 +32,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 public class UserLog {
+
     
     @Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "idgen")
@@ -38,4 +45,13 @@ public class UserLog {
 	private String activity;
 	@Column(name="logdate")
 	private Date logDate;
+
+	public  ZonedDateTime getInstanceLogDate(){
+        
+        if(this.logDate != null){
+            return this.logDate.toInstant().atZone(ZoneId.of("Asia/Jakarta"));
+        }else{
+            return null;
+        }
+    }
 }

@@ -109,24 +109,20 @@ public class AlertingController {
         ResponseEntity  responseEntity =  restTemplate.exchange(falcoUrl+"/rule/action", HttpMethod.GET, requestEntity, String.class);
         CustomRuleFalco[] customRuleFalcoList = new Gson().fromJson(responseEntity.getBody().toString(), CustomRuleFalco[].class);
 
-
-
         ConfigMap cmcustom =  openshiftClientService.getConnection().configMaps().inNamespace(kNameSpace).withName("mail-options").get();
         Properties properties = new Properties();
         InputStream stream = new ByteArrayInputStream(cmcustom.getData().get("mail-options.incl").getBytes(StandardCharsets.UTF_8));
         properties.load(stream);
  
- 
         CustomRuleFalco imageScanNOTIFY = new CustomRuleFalco();
 
-        
-         imageScanNOTIFY.setId(5);
-         imageScanNOTIFY.setActionName("ImageScanNOTIFY");
-         imageScanNOTIFY.setRuleName("Image Scan");
-         imageScanNOTIFY.setEnabled(Boolean.parseBoolean(properties.getProperty("ImageScanNOTIFY")) ? 1 : 0);
+        imageScanNOTIFY.setId(5);
+        imageScanNOTIFY.setActionName("ImageScanNOTIFY");
+        imageScanNOTIFY.setRuleName("Image Scan");
+        imageScanNOTIFY.setEnabled(Boolean.parseBoolean(properties.getProperty("ImageScanNOTIFY")) ? 1 : 0);
          
          
-         customRuleFalcoList = addX(customRuleFalcoList.length, customRuleFalcoList , imageScanNOTIFY );
+        customRuleFalcoList = addX(customRuleFalcoList.length, customRuleFalcoList , imageScanNOTIFY );
 
         model.addAttribute("list", customRuleFalcoList);
 
@@ -146,19 +142,25 @@ public class AlertingController {
     public  @ResponseBody String updateCustomRule( @RequestParam Map<String,String> allParams ) throws IOException {
 
     	String enabled = "";
-    	String actionId = "";
     	String id = "";
+        int actionId = 0;
+        String name = "";
+        String actionName = "";
 
         if (allParams.containsKey("id")){
     		id =  allParams.get("id");
     	}
 
     	if (allParams.containsKey("actionId")){
-    		actionId =  allParams.get("actionId");
+    		actionId =  Integer.parseInt(allParams.get("actionId"));
     	}
 
     	if (allParams.containsKey("enabled")){
     		enabled =  allParams.get("enabled");
+    	}
+
+        if (allParams.containsKey("name")){
+    		name =  allParams.get("name");
     	}
 
         if(!util.isUserLoggedIn()){
@@ -171,16 +173,27 @@ public class AlertingController {
         headers.setBasicAuth(falcoUsername, falcoPassword);
 
         Map<String, String> bodyParamMap = new HashMap<String, String>();
-        bodyParamMap.put("action_id", actionId );
+        bodyParamMap.put("action_id", ""+actionId );
         bodyParamMap.put("enabled", enabled);
 
         HttpEntity requestEntity = new HttpEntity(bodyParamMap,headers);
 
+        //get action list
+        ResponseEntity  responseEntityAction =  restTemplate.exchange(falcoUrl+"/rule/action", HttpMethod.GET, requestEntity, String.class);
+        CustomRuleFalco[] customRuleFalcoList = new Gson().fromJson(responseEntityAction.getBody().toString(), CustomRuleFalco[].class);
+
+        //post save
         ResponseEntity<String> responseEntity =  restTemplate.exchange(falcoUrl+"/rule/action/"+id, HttpMethod.PUT, requestEntity, String.class);
-      
+       
+        for(CustomRuleFalco customRuleFalco:customRuleFalcoList){
+           if( customRuleFalco.getId() == actionId ){
+            actionName = customRuleFalco.getActionName();
+           }
+        }
+
 
 		UserLog userLog = new UserLog();
-		userLog.setActivity("Update Alert ID = \""+ id +"\", actionId =  \""+ actionId +"\", enabled =  \""+ enabled +"\"  ");
+		userLog.setActivity("Update Alert Name = \""+ name +"\" , action =  \""+ actionName +"\", enabled = \""+ (enabled.equals("1")  ? "Enable" : "Disabled") +"\" , ID = \""+ id +"\"");
 		userLog.setLogDate(new Date());
 		userLog.setName(util.getLoggedUserName());
 		userLogRepository.save(userLog);
@@ -272,11 +285,18 @@ public class AlertingController {
     
         openshiftClientService.getConnection().configMaps().inNamespace(kNameSpace).createOrReplace(newConfigMap);
 
+        // UserLog userLog = new UserLog();
+		// userLog.setActivity("Update Runtime Alert = "+ enabled);
+		// userLog.setLogDate(new Date());
+		// userLog.setName(util.getLoggedUserName());
+		// userLogRepository.save(userLog);
+
         UserLog userLog = new UserLog();
-		userLog.setActivity("Update Runtime Alert = "+ enabled);
+		userLog.setActivity("Update Alert Name = Image Scan , enabled = \""+ (enabled.equals("1")  ? "Enable" : "Disabled") +"\" ");
 		userLog.setLogDate(new Date());
 		userLog.setName(util.getLoggedUserName());
 		userLogRepository.save(userLog);
+
 
     	return "OK";
     }

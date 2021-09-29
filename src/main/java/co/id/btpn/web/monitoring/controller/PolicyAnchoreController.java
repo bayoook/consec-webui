@@ -223,7 +223,7 @@ public class PolicyAnchoreController {
     
 
         UserLog userLog = new UserLog();
-        userLog.setActivity("Update Scanning Policy = \""+ temp.getName() +"\", enabled = \""+ (enabled ? "Enable" : "Disabled") +"\" ");
+        userLog.setActivity("Update Scanning Policy = \""+ temp.getName() +"\", enabled = \""+ (enabled ? "Enable" : "Disabled") +"\" , ID = "+id+" ");
         userLog.setLogDate(new java.util.Date());
         userLog.setName(util.getLoggedUserName());
         userLogRepository.save(userLog);

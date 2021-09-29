@@ -20,11 +20,11 @@
 
 
 
-function updateRow(enabledVar,actionIdVar,idVar,type){
+function updateRow(enabledVar,actionIdVar,idVar,type, nameVar){
 	
 
 	if(type==1){
-		handleAjax('/imagealertupdate', 'POST', { enabled:enabledVar, actionId:actionIdVar.value, id:idVar  }, function(res) {
+		handleAjax('/imagealertupdate', 'POST', { enabled:enabledVar, actionId:actionIdVar.value, id:idVar , name:nameVar  }, function(res) {
 			swal.fire(
 				'Success!',
 				'Your data has been updated.',
@@ -37,7 +37,7 @@ function updateRow(enabledVar,actionIdVar,idVar,type){
 	}else{
 
 		var enabledInt = enabledVar.checked ? 1:0;
-		handleAjax('/imagealertupdate', 'POST', { enabled:enabledInt, actionId:actionIdVar, id:idVar  }, function(res) {
+		handleAjax('/imagealertupdate', 'POST', { enabled:enabledInt, actionId:actionIdVar, id:idVar, name:nameVar  }, function(res) {
 			swal.fire(
 				'Success!',
 				'Your data has been updated.',
@@ -129,10 +129,12 @@ var KTDatatablesBasicPaginations = function() {
 							 data = data.replace(/<\/?span[^>]*>/g,"");
 							 var enableRow = row[3].replace(/<\/?span[^>]*>/g,"");
 							 var idRow = row[0].replace(/<\/?span[^>]*>/g,"");
+							 var name = row[1].replace(/<\/?span[^>]*>/g,"");
 
 
 
-							 var $select = $("<select onchange='updateRow("+enableRow+",this,"+idRow+",1)'></select>", {});
+
+							 var $select = $("<select onchange='updateRow("+enableRow+",this,"+idRow+",1,\""+name+"\")'></select>", {});
 
 							 
 							 optionAction.forEach(function(obj) { 
@@ -169,6 +171,7 @@ var KTDatatablesBasicPaginations = function() {
 							 var idAction = '';
 						     var actionRow = row[2].replace(/<\/?span[^>]*>/g,"");
 							 var idRow = row[0].replace(/<\/?span[^>]*>/g,"");
+							 var name = row[1].replace(/<\/?span[^>]*>/g,"");
 							 var enabledRow = row[3].replace(/<\/?span[^>]*>/g,"");
 
 							 optionAction.forEach(function(obj) { 
@@ -180,9 +183,9 @@ var KTDatatablesBasicPaginations = function() {
 							});
 							if(idRow != 5){
 								if(enabledRow == 1){
-									return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  checked="'+enabledRow+'" onclick="updateRow(this,\''+idAction+'\','+idRow+')" /><span></span></label></span>';	
+									return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  checked="'+enabledRow+'" onclick="updateRow(this,\''+idAction+'\','+idRow+',0,\''+name+'\')" /><span></span></label></span>';	
 								}else{
-									return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  onclick="updateRow(this,\''+idAction+'\','+idRow+')" /><span></span></label></span>';	
+									return '<span class="switch switch-sm switch-icon"> <label> <input type="checkbox"  onclick="updateRow(this,\''+idAction+'\','+idRow+',0,\''+name+'\')" /><span></span></label></span>';	
 								}
 							}else{
 								if(enabledRow == 1){

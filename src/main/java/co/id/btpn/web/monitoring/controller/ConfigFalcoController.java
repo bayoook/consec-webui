@@ -108,11 +108,8 @@ public class ConfigFalcoController {
     @PostMapping("configfalcoedit")
     public String editPost(Param  paramFalco, Model model, @ModelAttribute("attributes") Map<?,?> attributes) {
         
-       
-    	//configFalcoService.update(configFalco);
 
-
-        NonNamespaceOperation<ConfigMap, ConfigMapList, Resource<ConfigMap>>  cm =  openshiftClientService.getConnection().configMaps().inNamespace(fNameSpace);
+       NonNamespaceOperation<ConfigMap, ConfigMapList, Resource<ConfigMap>>  cm =  openshiftClientService.getConnection().configMaps().inNamespace(fNameSpace);
        Map<String,String> map = cm.withName("falco").get().getData();
 
        System.out.println("after replace "+paramFalco.getValue().replace(PRETY_PREFIX, "").replace(PRETY_SUFIX, "").replace(PRETY_PREFIX_, ""));
@@ -137,8 +134,7 @@ public class ConfigFalcoController {
        userLog.setName(util.getLoggedUserName());
        userLogRepository.save(userLog);
        
-
-    	return "redirect:configfalcoindex";
+       return "redirect:configfalcoindex";
     }
     
         

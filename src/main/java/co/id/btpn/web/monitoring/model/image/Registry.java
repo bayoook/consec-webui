@@ -5,16 +5,24 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import javax.annotation.Generated;
+import javax.persistence.Transient;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import lombok.Getter;
 import lombok.Setter;
+
+
 
 @Setter
 @Getter
 @Generated("jsonschema2pojo")
 public class Registry {
+
 
 @SerializedName("created_at")
 @Expose

@@ -26,6 +26,7 @@ var KTDatatablesBasicPaginations = function() {
 
 		// begin first table
 		table.DataTable({
+			order: [3, 'desc' ],
 			responsive: true,
 			pagingType: 'full_numbers',
 			buttons: [
@@ -262,7 +263,7 @@ jQuery(document).ready(function() {
 						<td class="dt-center"><span  th:text="${listObjStat.index+1}"></span></td>
 						<td><span  th:text="${listObj.name}"></span></td>
 						<td><span  th:text="${listObj.activity}"></span></td>
-						<td><span  th:text="${listObj.logDate}"></span></td>
+						<td><span  th:text="${#temporals.format(listObj.instanceLogDate , 'dd-MM-yyyy HH:mm:ss')}"></span></td>
 						
 					</tr>
 				

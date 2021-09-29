@@ -140,6 +140,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/").permitAll()
 				.antMatchers("/login").permitAll()
 				.antMatchers("/layout").hasAnyAuthority("ADMIN", "USER")
+				.anyRequest()
+				.authenticated()
 				.and().csrf().disable().formLogin()
 				.loginPage("/login").failureUrl("/login?error=true")
 				.successHandler(customLoginListener)
@@ -156,7 +158,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .maximumSessions(1)
                 .sessionRegistry(sessionRegistry())
                 .maxSessionsPreventsLogin(true)
-                .expiredUrl("/logout");
+                .expiredUrl("/login");
 	}
 	
 	@Override
@@ -179,7 +181,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 LOG.info(">>>>> Session Destroyed, Session id {}" , se.getSession().getId());
 
                 HttpSession session= se.getSession();
-				SecurityContextHolder.getContext().setAuthentication(null);
                 SecurityContextHolder.clearContext();
                      session= se.getSession();
                     if(session != null) {
